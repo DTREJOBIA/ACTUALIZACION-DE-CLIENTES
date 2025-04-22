@@ -35,31 +35,39 @@
     </form>
   </div>
   <a href="index.html" class="btn btn-secondary floating-btn">⬅️ Volver</a>
-  <script>
-    function enviarFormulario() {
-      const codigo = document.getElementById("codigo").value;
-      const nombre = document.getElementById("nombre").value;
-      const direccion = document.getElementById("direccion").value;
+<script>
+  function enviarNombreDireccion() {
+    const codigo = document.getElementById("codigo").value;
+    const nombre = document.getElementById("nombre").value;
+    const direccion = document.getElementById("direccion").value;
 
-      if (!codigo || !nombre || !direccion) {
-        alert("⚠️ Por favor completa todos los campos.");
-        return;
-      }
-
-      fetch('https://script.google.com/macros/s/AKfycbzTeY0pmn6tmgkZ4DHrhZveRplKm1J1b-4jY8O2vqX_Ktm8kdOtZrXj2r4y6JsdTfZQDQ/exec', {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({codigo, nombre, direccion})
-      })
-      .then(() => {
-        alert("✅ Datos enviados correctamente.");
-        document.querySelector("form").reset();
-      })
-      .catch(error => {
-        alert("❌ Error al enviar los datos: " + error);
-      });
+    if (!codigo || !nombre || !direccion) {
+      alert("⚠️ Por favor completa todos los campos.");
+      return;
     }
-  </script>
+
+    fetch('https://script.google.com/macros/s/AKfycbzibTYzh67G2Cpw1mcSvXFHmPDX5Ul8DPh69Vj2rHdZWi0rlyEL4KhFvmHOINu4Fq4TPA/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tipo: "actualizar_nombre_direccion",
+        codigo: codigo,
+        nombre: nombre,
+        direccion: direccion
+      })
+    })
+    .then(() => {
+      alert("✅ Datos enviados correctamente.");
+      document.getElementById("codigo").value = "";
+      document.getElementById("nombre").value = "";
+      document.getElementById("direccion").value = "";
+    })
+    .catch(error => {
+      alert("❌ Error al enviar los datos: " + error);
+    });
+  }
+</script>
+
 </body>
 </html>
