@@ -19,7 +19,7 @@
       font-weight: bold;
     }
     footer {
-      background-color: #0b0b0b;
+      background-color: #f8f9fa;
       padding: 20px 0;
       margin-top: 50px;
       text-align: center;
@@ -67,44 +67,50 @@
         return;
       }
 
-      fetch('https://script.google.com/macros/s/AKfycbzmtie8bK1COkX5D7m4jrGZBTK7ro_F8Ej-7afg7tnkdyhfi_Il1JApJ1SRBHYei-YC2Q/exec', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    tipo: "crear",
-    ruta: document.getElementById("ruta").value.trim(),
-    nombre: document.getElementById("nombre").value.trim(),
-    direccion: document.getElementById("direccion").value.trim(),
-    semana: document.getElementById("semana").value,
-    dia: document.getElementById("dia").value,
-    id: document.getElementById("id").value.trim(),
-    rtn: document.getElementById("rtn").value.trim(),
-    telefono: document.getElementById("telefono").value.trim(),
-    coordenadas: document.getElementById("coordenadas").value.trim()
-  })
-})
-.then(response => response.json()) // Convertir la respuesta en JSON
-.then(data => {
-  if (data.estado === "éxito") {
-    alert("✅ Cliente creado exitosamente.");
-    document.getElementById("ruta").value = "";
-    document.getElementById("nombre").value = "";
-    document.getElementById("direccion").value = "";
-    document.getElementById("semana").value = "";
-    document.getElementById("dia").value = "";
-    document.getElementById("id").value = "";
-    document.getElementById("rtn").value = "";
-    document.getElementById("telefono").value = "";
-    document.getElementById("coordenadas").value = "";
-  } else {
-    alert("❌ Error al enviar los datos: " + data.mensaje);
-  }
-})
-.catch(error => {
-  console.error("Error al conectar con la hoja:", error);
-  alert("❌ Error al conectar con la hoja de cálculo: " + error);
-});
+      const latitud = coordenadas.split(",")[0];
+      const longitud = coordenadas.split(",")[1];
 
+      const datos = {
+        tipo: "crear",
+        ruta: ruta,
+        nombre: nombre,
+        direccion: direccion,
+        semana: semana,
+        dia: dia,
+        id: id,
+        rtn: rtn,
+        telefono: telefono,
+        latitud: latitud,
+        longitud: longitud
+      };
+
+      fetch('https://script.google.com/macros/s/AKfycbzmtie8bK1COkX5D7m4jrGZBTK7ro_F8Ej-7afg7tnkdyhfi_Il1JApJ1SRBHYei-YC2Q/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.result === "success") {
+          alert("✅ Cliente creado exitosamente.");
+          document.getElementById("ruta").value = "";
+          document.getElementById("nombre").value = "";
+          document.getElementById("direccion").value = "";
+          document.getElementById("semana").value = "";
+          document.getElementById("dia").value = "";
+          document.getElementById("id").value = "";
+          document.getElementById("rtn").value = "";
+          document.getElementById("telefono").value = "";
+          document.getElementById("coordenadas").value = "";
+          document.getElementById("coordenadas").classList.remove("completo");
+        } else {
+          alert("❌ Error del servidor: " + (data.error || "Respuesta desconocida."));
+        }
+      })
+      .catch(error => {
+        console.error("Fetch error:", error);
+        alert("❌ Error al enviar los datos. Revisa la consola para más detalles.");
+      });
     }
 
     function refrescarFormulario() {
@@ -184,7 +190,7 @@
 
   <footer>
     <img src="ChatGPT Image 22 abr 2025 08_25_00.png" alt="Logo RTM" />
-    <p class="text-white mt-2 mb-0">© 2025 BIA HONDURAS • Todos los derechos reservados</p>
+    <p class="text-muted mt-2 mb-0">© 2025 BIA HONDURAS • Todos los derechos reservados</p>
   </footer>
 </body>
 </html>
