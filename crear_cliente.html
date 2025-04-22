@@ -31,7 +31,7 @@
   <script>
     function obtenerCoordenadas() {
       const inputLat = document.getElementById("coordenadas");
-      inputLat.value = "";
+      inputLat.value = ""; // Limpiar campo
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -39,7 +39,7 @@
           inputLat.value = latLon;
           inputLat.classList.add("completo");
         }, function(error) {
-          alert("⚠️ No se pudieron obtener las coordenadas.");
+          alert("⚠️ No se pudieron obtener las coordenadas. Verifica que el GPS esté activo.");
           console.error("Geolocation error:", error);
         }, {
           enableHighAccuracy: true,
@@ -51,18 +51,14 @@
       }
     }
 
-    function refrescarFormulario() {
-      window.location.reload();
-    }
-
-    function enviarNuevoCliente() {
+    function enviarFormulario() {
       const ruta = document.getElementById("ruta").value.trim();
       const nombre = document.getElementById("nombre").value.trim();
       const direccion = document.getElementById("direccion").value.trim();
       const semana = document.getElementById("semana").value;
       const dia = document.getElementById("dia").value;
-      const rtn = document.getElementById("rtn").value.trim();
       const id = document.getElementById("id").value.trim();
+      const rtn = document.getElementById("rtn").value.trim();
       const telefono = document.getElementById("telefono").value.trim();
       const coordenadas = document.getElementById("coordenadas").value.trim();
 
@@ -71,88 +67,117 @@
         return;
       }
 
-      const [lat, lon] = coordenadas.split(",");
-
-      fetch("https://script.google.com/macros/s/AKfycbzibTYzh67G2Cpw1mcSvXFHmPDX5Ul8DPh69Vj2rHdZWi0rlyEL4KhFvmHOINu4Fq4TPA/exec", {
-        method: "POST",
-        mode: "no-cors",
+      fetch('https://script.google.com/macros/s/AKfycbzibTYzh67G2Cpw1mcSvXFHmPDX5Ul8DPh69Vj2rHdZWi0rlyEL4KhFvmHOINu4Fq4TPA/exec', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          ruta, nombre, direccion, semana, dia, rtn, id, telefono,
-          latitud: lat,
-          longitud: lon
+          tipo: "crear",
+          ruta: ruta,
+          nombre: nombre,
+          direccion: direccion,
+          semana: semana,
+          dia: dia,
+          id: id,
+          rtn: rtn,
+          telefono: telefono,
+          coordenadas: coordenadas
         })
       })
-      .then(() => {
-        alert("✅ Cliente creado y enviado correctamente.");
-        refrescarFormulario();
+      .then(response => {
+        if (response.ok) {
+          alert("✅ Cliente creado exitosamente.");
+          document.getElementById("ruta").value = "";
+          document.getElementById("nombre").value = "";
+          document.getElementById("direccion").value = "";
+          document.getElementById("semana").value = "";
+          document.getElementById("dia").value = "";
+          document.getElementById("id").value = "";
+          document.getElementById("rtn").value = "";
+          document.getElementById("telefono").value = "";
+          document.getElementById("coordenadas").value = "";
+        } else {
+          alert("❌ Error al enviar los datos. Inténtalo de nuevo.");
+        }
       })
       .catch(error => {
-        alert("❌ Error al enviar los datos: " + error);
+        alert("❌ Error al conectar con la hoja de cálculo: " + error);
       });
+    }
+
+    function refrescarFormulario() {
+      window.location.reload();
     }
   </script>
 </head>
 <body>
   <div class="container mt-5">
     <h2 class="text-center mb-4">Crear Cliente Nuevo</h2>
-    <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarNuevoCliente();">
+    <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarFormulario();">
       <div class="mb-3">
         <label for="ruta" class="form-label">Ruta:</label>
         <input type="text" class="form-control" id="ruta" required>
       </div>
+
       <div class="mb-3">
-        <label for="nombre" class="form-label">Nombre:</label>
+        <label for="nombre" class="form-label">Nombre del Cliente:</label>
         <input type="text" class="form-control" id="nombre" required>
       </div>
+
       <div class="mb-3">
         <label for="direccion" class="form-label">Dirección:</label>
         <input type="text" class="form-control" id="direccion" required>
       </div>
+
       <div class="mb-3">
         <label for="semana" class="form-label">Semana de Visita:</label>
-        <select class="form-control" id="semana" required>
-          <option value="">Seleccione una semana</option>
-          <option>Semana1</option>
-          <option>Semana2</option>
-          <option>Semana3</option>
-          <option>Semana4</option>
+        <select class="form-select" id="semana" required>
+          <option value="">Selecciona una semana</option>
+          <option value="semana1">Semana 1</option>
+          <option value="semana2">Semana 2</option>
+          <option value="semana3">Semana 3</option>
+          <option value="semana4">Semana 4</option>
         </select>
       </div>
+
       <div class="mb-3">
         <label for="dia" class="form-label">Día de Visita:</label>
-        <select class="form-control" id="dia" required>
-          <option value="">Seleccione un día</option>
-          <option>Lunes</option>
-          <option>Martes</option>
-          <option>Miércoles</option>
-          <option>Jueves</option>
-          <option>Viernes</option>
-          <option>Sábado</option>
-          <option>Domingo</option>
+        <select class="form-select" id="dia" required>
+          <option value="">Selecciona un día</option>
+          <option value="Lunes">Lunes</option>
+          <option value="Martes">Martes</option>
+          <option value="Miércoles">Miércoles</option>
+          <option value="Jueves">Jueves</option>
+          <option value="Viernes">Viernes</option>
+          <option value="Sábado">Sábado</option>
+          <option value="Domingo">Domingo</option>
         </select>
       </div>
+
+      <div class="mb-3">
+        <label for="id" class="form-label">ID del Cliente:</label>
+        <input type="text" class="form-control" id="id" required>
+      </div>
+
       <div class="mb-3">
         <label for="rtn" class="form-label">RTN (opcional):</label>
         <input type="text" class="form-control" id="rtn">
       </div>
-      <div class="mb-3">
-        <label for="id" class="form-label">ID:</label>
-        <input type="text" class="form-control" id="id" required>
-      </div>
+
       <div class="mb-3">
         <label for="telefono" class="form-label">Teléfono (opcional):</label>
-        <input type="text" class="form-control" id="telefono">
+        <input type="tel" class="form-control" id="telefono">
       </div>
+
       <div class="mb-3">
         <label for="coordenadas" class="form-label">Coordenadas (Latitud, Longitud):</label>
         <input type="text" class="form-control readonly" id="coordenadas" readonly>
       </div>
-      <button type="button" class="btn btn-info w-100 mb-2" onclick="obtenerCoordenadas()">📍 Obtener Coordenadas</button>
-      <button type="submit" class="btn btn-primary w-100 mb-2">📤 Enviar</button>
-      <button type="button" class="btn btn-warning w-100" onclick="refrescarFormulario()">🔄 Refrescar</button>
+
+      <button type="button" class="btn btn-info w-100" onclick="obtenerCoordenadas()">📍 Obtener Coordenadas</button>
+      <button type="submit" class="btn btn-primary w-100 mt-3">📤 Enviar</button>
+      <button type="button" class="btn btn-warning w-100 mt-2" onclick="refrescarFormulario()">🔄 Refrescar</button>
     </form>
   </div>
 
