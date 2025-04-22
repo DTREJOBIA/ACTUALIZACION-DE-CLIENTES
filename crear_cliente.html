@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crear Cliente Nuevo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .floating-btn { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Crear Cliente Nuevo</h2>
+    <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarFormulario();">
+      <input class="form-control mb-2" id="ruta" placeholder="Ruta" required />
+      <input class="form-control mb-2" id="semana" placeholder="Semana de Visita" required />
+      <input class="form-control mb-2" id="dia" placeholder="Día de Visita" required />
+      <input class="form-control mb-2" id="nombre" placeholder="Nombre del Cliente" required />
+      <input class="form-control mb-2" id="direccion" placeholder="Dirección" required />
+      <input class="form-control mb-2" id="id" placeholder="ID" required />
+      <input class="form-control mb-2" id="rtn" placeholder="RTN" required />
+      <input class="form-control mb-2" id="telefono" placeholder="Teléfono" required />
+      <input class="form-control mb-2 readonly" id="coordenadas" readonly placeholder="Coordenadas" />
+      <button type="button" class="btn btn-info w-100 mb-2" onclick="obtenerCoordenadas()">📍 Obtener Coordenadas</button>
+      <button type="submit" class="btn btn-success w-100">📤 Enviar</button>
+    </form>
+  </div>
+  <a href="index.html" class="btn btn-secondary floating-btn">⬅️ Volver</a>
+  <script>
+    function obtenerCoordenadas() {
+      const input = document.getElementById("coordenadas");
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const coord = pos.coords.latitude + "," + pos.coords.longitude;
+          input.value = coord;
+        }, err => alert("⚠️ No se pudo obtener la ubicación."));
+      } else {
+        alert("❌ Geolocalización no disponible.");
+      }
+    }
+
+    function enviarFormulario() {
+      const datos = {
+        ruta: ruta.value, semana: semana.value, dia: dia.value,
+        nombre: nombre.value, direccion: direccion.value,
+        id: id.value, rtn: rtn.value, telefono: telefono.value,
+        coordenadas: coordenadas.value
+      };
+      if (Object.values(datos).some(v => !v)) {
+        alert("⚠️ Por favor completa todos los campos.");
+        return;
+      }
+      fetch('https://script.google.com/macros/s/AKfycbzTeY0pmn6tmgkZ4DHrhZveRplKm1J1b-4jY8O2vqX_Ktm8kdOtZrXj2r4y6JsdTfZQDQ/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
+      }).then(() => {
+        alert("✅ Cliente creado correctamente.");
+        document.querySelector("form").reset();
+      }).catch(error => alert("❌ Error al enviar los datos: " + error));
+    }
+  </script>
+</body>
+</html>
