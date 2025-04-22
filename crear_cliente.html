@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Formulario con Coordenadas</title>
+  <title>Crear Cliente Nuevo</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     .readonly {
@@ -30,37 +29,9 @@
     }
   </style>
   <script>
-    let clientes = [];
-
-    fetch('clientes.json')
-      .then(response => response.json())
-      .then(data => {
-        clientes = data;
-      })
-      .catch(error => {
-        alert("❌ Error al cargar la lista de clientes: " + error);
-      });
-
-    // Función para buscar cliente por código
-    function buscarClientePorCodigo() {
-      const codigo = document.getElementById("codigo").value.trim();
-      const cliente = clientes.find(c => c.codigo === codigo);
-      const inputNombre = document.getElementById("nombre");
-
-      if (cliente) {
-        inputNombre.value = cliente.nombre;
-        inputNombre.classList.add("completo");
-      } else {
-        inputNombre.value = "";
-        inputNombre.classList.remove("completo");
-        alert("⚠️ Cliente no encontrado.");
-      }
-    }
-
-    // Función para obtener coordenadas
-    function obtenerCoordenadas(idLatitud) {
-      const inputLat = document.getElementById(idLatitud);
-      inputLat.value = ""; // Limpia antes de obtener nuevas
+    function obtenerCoordenadas() {
+      const inputLat = document.getElementById("coordenadas");
+      inputLat.value = "";
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -68,7 +39,7 @@
           inputLat.value = latLon;
           inputLat.classList.add("completo");
         }, function(error) {
-          alert("⚠️ No se pudieron obtener las coordenadas. Verifica que el GPS esté activo.");
+          alert("⚠️ No se pudieron obtener las coordenadas.");
           console.error("Geolocation error:", error);
         }, {
           enableHighAccuracy: true,
@@ -80,57 +51,43 @@
       }
     }
 
-    // Función para copiar coordenadas al portapapeles
-    function copiarCoordenadas(idLatitud) {
-      const coordenadas = document.getElementById(idLatitud).value;
-      if (coordenadas) {
-        navigator.clipboard.writeText(coordenadas).then(() => {
-          alert("📋 ¡Coordenadas copiadas al portapapeles!");
-        }).catch((err) => {
-          alert("❌ Error al copiar las coordenadas: " + err);
-        });
-      } else {
-        alert("⚠️ No hay coordenadas para copiar.");
-      }
-    }
-
-    // Función para refrescar el formulario
     function refrescarFormulario() {
       window.location.reload();
     }
 
-    // Función para enviar los datos del formulario
-    function enviarFormulario(url, idLatitud) {
-      const nombre = document.getElementById("nombre").value;
-      const codigo = document.getElementById("codigo").value;
-      const latLon = document.getElementById(idLatitud).value;
+    function enviarNuevoCliente() {
+      const ruta = document.getElementById("ruta").value.trim();
+      const nombre = document.getElementById("nombre").value.trim();
+      const direccion = document.getElementById("direccion").value.trim();
+      const semana = document.getElementById("semana").value;
+      const dia = document.getElementById("dia").value;
+      const rtn = document.getElementById("rtn").value.trim();
+      const id = document.getElementById("id").value.trim();
+      const telefono = document.getElementById("telefono").value.trim();
+      const coordenadas = document.getElementById("coordenadas").value.trim();
 
-      if (!nombre || !codigo || !latLon) {
-        alert("⚠️ Por favor completa todos los campos.");
+      if (!ruta || !nombre || !direccion || !semana || !dia || !id || !coordenadas) {
+        alert("⚠️ Por favor completa todos los campos obligatorios.");
         return;
       }
 
-      // Cambio de URL a la nueva hoja de Google Apps Script
-      fetch('https://script.google.com/macros/s/AKfycbzibTYzh67G2Cpw1mcSvXFHmPDX5Ul8DPh69Vj2rHdZWi0rlyEL4KhFvmHOINu4Fq4TPA/exec', {
-        method: 'POST',
-        mode: 'no-cors',
+      const [lat, lon] = coordenadas.split(",");
+
+      fetch("https://script.google.com/macros/s/AKfycbzibTYzh67G2Cpw1mcSvXFHmPDX5Ul8DPh69Vj2rHdZWi0rlyEL4KhFvmHOINu4Fq4TPA/exec", {
+        method: "POST",
+        mode: "no-cors",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          nombre: nombre,
-          codigo: codigo,
-          latitud: latLon.split(",")[0],
-          longitud: latLon.split(",")[1]
+          ruta, nombre, direccion, semana, dia, rtn, id, telefono,
+          latitud: lat,
+          longitud: lon
         })
       })
       .then(() => {
-        alert("✅ Datos enviados correctamente.");
-        document.getElementById("codigo").value = "";
-        document.getElementById("nombre").value = "";
-        document.getElementById(idLatitud).value = "";
-        document.getElementById("nombre").classList.remove("completo");
-        document.getElementById(idLatitud).classList.remove("completo");
+        alert("✅ Cliente creado y enviado correctamente.");
+        refrescarFormulario();
       })
       .catch(error => {
         alert("❌ Error al enviar los datos: " + error);
@@ -139,55 +96,63 @@
   </script>
 </head>
 <body>
-  <!-- Página principal de coordenadas -->
   <div class="container mt-5">
-    <h2 class="text-center mb-4">Actualización de Coordenadas</h2>
-    <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarFormulario('https://script.google.com/macros/s/AKfycbzibTYzh67G2Cpw1mcSvXFHmPDX5Ul8DPh69Vj2rHdZWi0rlyEL4KhFvmHOINu4Fq4TPA/exec', 'latitud');">
+    <h2 class="text-center mb-4">Crear Cliente Nuevo</h2>
+    <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarNuevoCliente();">
       <div class="mb-3">
-        <label for="codigo" class="form-label">Código del Cliente:</label>
-        <input type="text" class="form-control" id="codigo" required onblur="buscarClientePorCodigo()">
+        <label for="ruta" class="form-label">Ruta:</label>
+        <input type="text" class="form-control" id="ruta" required>
       </div>
-
       <div class="mb-3">
-        <label for="nombre" class="form-label">Nombre del Cliente:</label>
-        <input type="text" class="form-control readonly" id="nombre" readonly>
+        <label for="nombre" class="form-label">Nombre:</label>
+        <input type="text" class="form-control" id="nombre" required>
       </div>
-
       <div class="mb-3">
-        <label for="latitud" class="form-label">Coordenadas (Latitud, Longitud):</label>
-        <input type="text" class="form-control readonly" id="latitud" readonly>
+        <label for="direccion" class="form-label">Dirección:</label>
+        <input type="text" class="form-control" id="direccion" required>
       </div>
-
-      <button type="button" class="btn btn-info w-100" onclick="obtenerCoordenadas('latitud')">📍 Obtener Coordenadas</button>
-      <button type="button" class="btn btn-secondary w-100 mt-2" onclick="copiarCoordenadas('latitud')">📋 Copiar Coordenadas</button>
-      <button type="submit" class="btn btn-primary w-100 mt-3">📤 Enviar</button>
-      <button type="button" class="btn btn-warning w-100 mt-2" onclick="refrescarFormulario()">🔄 Refrescar</button>
-    </form>
-  </div>
-
-  <!-- Página de crear cliente nuevo -->
-  <div class="container mt-5">
-    <h2 class="text-center mb-4">Creación de Cliente Nuevo</h2>
-    <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarFormulario('https://script.google.com/macros/s/AKfycbzibTYzh67G2Cpw1mcSvXFHmPDX5Ul8DPh69Vj2rHdZWi0rlyEL4KhFvmHOINu4Fq4TPA/exec', 'coordenadas');">
       <div class="mb-3">
-        <label for="codigo" class="form-label">Código del Cliente:</label>
-        <input type="text" class="form-control" id="codigo" required onblur="buscarClientePorCodigo()">
+        <label for="semana" class="form-label">Semana de Visita:</label>
+        <select class="form-control" id="semana" required>
+          <option value="">Seleccione una semana</option>
+          <option>Semana1</option>
+          <option>Semana2</option>
+          <option>Semana3</option>
+          <option>Semana4</option>
+        </select>
       </div>
-
       <div class="mb-3">
-        <label for="nombre" class="form-label">Nombre del Cliente:</label>
-        <input type="text" class="form-control readonly" id="nombre" readonly>
+        <label for="dia" class="form-label">Día de Visita:</label>
+        <select class="form-control" id="dia" required>
+          <option value="">Seleccione un día</option>
+          <option>Lunes</option>
+          <option>Martes</option>
+          <option>Miércoles</option>
+          <option>Jueves</option>
+          <option>Viernes</option>
+          <option>Sábado</option>
+          <option>Domingo</option>
+        </select>
       </div>
-
+      <div class="mb-3">
+        <label for="rtn" class="form-label">RTN (opcional):</label>
+        <input type="text" class="form-control" id="rtn">
+      </div>
+      <div class="mb-3">
+        <label for="id" class="form-label">ID:</label>
+        <input type="text" class="form-control" id="id" required>
+      </div>
+      <div class="mb-3">
+        <label for="telefono" class="form-label">Teléfono (opcional):</label>
+        <input type="text" class="form-control" id="telefono">
+      </div>
       <div class="mb-3">
         <label for="coordenadas" class="form-label">Coordenadas (Latitud, Longitud):</label>
         <input type="text" class="form-control readonly" id="coordenadas" readonly>
       </div>
-
-      <button type="button" class="btn btn-info w-100" onclick="obtenerCoordenadas('coordenadas')">📍 Obtener Coordenadas</button>
-      <button type="button" class="btn btn-secondary w-100 mt-2" onclick="copiarCoordenadas('coordenadas')">📋 Copiar Coordenadas</button>
-      <button type="submit" class="btn btn-primary w-100 mt-3">📤 Enviar</button>
-      <button type="button" class="btn btn-warning w-100 mt-2" onclick="refrescarFormulario()">🔄 Refrescar</button>
+      <button type="button" class="btn btn-info w-100 mb-2" onclick="obtenerCoordenadas()">📍 Obtener Coordenadas</button>
+      <button type="submit" class="btn btn-primary w-100 mb-2">📤 Enviar</button>
+      <button type="button" class="btn btn-warning w-100" onclick="refrescarFormulario()">🔄 Refrescar</button>
     </form>
   </div>
 
@@ -197,4 +162,5 @@
   </footer>
 </body>
 </html>
+
 
