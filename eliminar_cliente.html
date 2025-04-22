@@ -30,27 +30,39 @@
     </form>
   </div>
   <a href="index.html" class="btn btn-secondary floating-btn">⬅️ Volver</a>
-  <script>
-    function enviarFormulario() {
-      const datos = {
-        codigo: document.getElementById("codigo").value,
-        ruta: document.getElementById("ruta").value,
-        motivo: document.getElementById("motivo").value,
-      };
-      if (Object.values(datos).some(v => !v)) {
-        alert("⚠️ Por favor completa todos los campos.");
-        return;
-      }
-      fetch('https://script.google.com/macros/s/AKfycbzTeY0pmn6tmgkZ4DHrhZveRplKm1J1b-4jY8O2vqX_Ktm8kdOtZrXj2r4y6JsdTfZQDQ/exec', {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(datos)
-      }).then(() => {
-        alert("✅ Cliente eliminado correctamente.");
-        document.querySelector("form").reset();
-      }).catch(error => alert("❌ Error al enviar los datos: " + error));
+<script>
+  function eliminarCliente() {
+    const codigo = document.getElementById("codigo").value;
+    const ruta = document.getElementById("ruta").value;
+    const motivo = document.getElementById("motivo").value;
+
+    if (!codigo || !ruta || !motivo) {
+      alert("⚠️ Por favor completa todos los campos.");
+      return;
     }
-  </script>
+
+    fetch('https://script.google.com/macros/s/AKfycbzibTYzh67G2Cpw1mcSvXFHmPDX5Ul8DPh69Vj2rHdZWi0rlyEL4KhFvmHOINu4Fq4TPA/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tipo: "eliminar_cliente",
+        codigo: codigo,
+        ruta: ruta,
+        motivo: motivo
+      })
+    })
+    .then(() => {
+      alert("✅ Cliente eliminado correctamente.");
+      document.getElementById("codigo").value = "";
+      document.getElementById("ruta").value = "";
+      document.getElementById("motivo").value = "";
+    })
+    .catch(error => {
+      alert("❌ Error al enviar los datos: " + error);
+    });
+  }
+</script>
+
 </body>
 </html>
