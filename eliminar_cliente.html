@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,6 +7,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     .floating-btn { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
+    #foto-error { display: none; }
+    .d-flex { display: flex; justify-content: space-between; align-items: center; }
   </style>
 </head>
 <body>
@@ -16,53 +17,182 @@
     <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarFormulario();">
       <div class="mb-3">
         <label for="codigo" class="form-label">Código del Cliente:</label>
-        <input type="text" class="form-control" id="codigo" required>
+        <input type="text" class="form-control" id="codigo" required oninput="buscarCliente()">
       </div>
       <div class="mb-3">
-        <label for="ruta" class="form-label">Ruta:</label>
-        <input type="text" class="form-control" id="ruta" required>
+        <label for="nombre" class="form-label">Nombre del Cliente:</label>
+        <input type="text" class="form-control" id="nombre" disabled>
+      </div>
+      <div class="mb-3">
+        <label for="ruta" class="form-label">Ruta (Solo números, máximo 3 caracteres):</label>
+        <input type="text" class="form-control" id="ruta" maxlength="3" pattern="\d{1,3}" required>
       </div>
       <div class="mb-3">
         <label for="motivo" class="form-label">Motivo de Cierre:</label>
         <input type="text" class="form-control" id="motivo" required>
       </div>
+      <div class="mb-3">
+        <label for="foto" class="form-label">Subir Foto (máx. 10MB, solo .jpg):</label>
+        <div class="d-flex">
+          <input type="file" class="form-control" id="foto" accept="image/jpeg" onchange="validarFoto()" required>
+          <button type="button" class="btn btn-primary ms-2" onclick="tomarFoto()">📷 Tomar Foto</button>
+        </div>
+        <small id="foto-error" class="form-text text-danger">⚠️ Solo se permite archivos .jpg y hasta 10MB.</small>
+      </div>
+      <div class="mb-3">
+        <video id="video" width="100%" height="auto" style="display:none;" autoplay></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <input type="file" id="captura-foto" style="display:none;" accept="image/jpeg" onchange="validarFoto()" />
+      </div>
       <button type="submit" class="btn btn-danger w-100">🗑️ Eliminar</button>
     </form>
   </div>
   <a href="index.html" class="btn btn-secondary floating-btn">⬅️ Volver</a>
-<script>
-  function eliminarCliente() {
-    const codigo = document.getElementById("codigo").value;
-    const ruta = document.getElementById("ruta").value;
-    const motivo = document.getElementById("motivo").value;
 
-    if (!codigo || !ruta || !motivo) {
-      alert("⚠️ Por favor completa todos los campos.");
-      return;
+  <script>
+    const URL_SCRIPT_UPLOAD = "https://script.google.com/macros/s/AKfycbweuTnupyPlz2Ej_fqddmu5fvZiyRAJ6xDg4ZAPSMvh5zNV8vWMShQjM8Dks81jMlwU6Q/exec"; // URL de tu Apps Script
+
+    // Función para buscar el nombre del cliente según el código
+    function buscarCliente() {
+      const codigo = document.getElementById("codigo").value;
+      if (codigo) {
+        fetch('clientes.json')
+          .then(response => response.json())
+          .then(data => {
+            const cliente = data.find(c => c.codigo === codigo);
+            if (cliente) {
+              document.getElementById("nombre").value = cliente.nombre;
+            } else {
+              document.getElementById("nombre").value = "Cliente no encontrado";
+            }
+          })
+          .catch(error => {
+            alert("❌ Error al buscar cliente: " + error);
+          });
+      }
     }
 
-    fetch('https://script.google.com/macros/s/AKfycbzibTYzh67G2Cpw1mcSvXFHmPDX5Ul8DPh69Vj2rHdZWi0rlyEL4KhFvmHOINu4Fq4TPA/exec', {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tipo: "eliminar_cliente",
-        codigo: codigo,
-        ruta: ruta,
-        motivo: motivo
+    // Función para validar el archivo de la foto
+    function validarFoto() {
+      const foto = document.getElementById('foto');
+      const error = document.getElementById('foto-error');
+      const file = foto.files[0];
+      if (file) {
+        if (file.size > 10 * 1024 * 1024 || !file.name.endsWith('.jpg')) {
+          error.style.display = 'block';
+          foto.value = ''; // Limpiar el campo si el archivo no es válido
+        } else {
+          error.style.display = 'none';
+        }
+      }
+    }
+
+    // Función para tomar foto desde la cámara
+    function tomarFoto() {
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("canvas");
+      const captura = document.getElementById("captura-foto");
+      
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(function(stream) {
+            video.style.display = "block";
+            video.srcObject = stream;
+
+            // Crear el botón para capturar la foto
+            if (!document.getElementById("capture-btn")) {
+              const captureBtn = document.createElement("button");
+              captureBtn.textContent = "Capturar Foto";
+              captureBtn.id = "capture-btn";
+              captureBtn.classList.add("btn", "btn-success");
+              captureBtn.onclick = function() {
+                const ctx = canvas.getContext("2d");
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const dataUrl = canvas.toDataURL("image/jpeg");
+                const blob = dataURLtoBlob(dataUrl);
+                captura.files = createFileList(blob);
+                video.style.display = "none";
+                canvas.style.display = "none";
+                stream.getTracks().forEach(track => track.stop());
+              };
+
+              // Añadir el botón para capturar la foto al formulario
+              document.querySelector("form").appendChild(captureBtn);
+            }
+          })
+          .catch(function(error) {
+            alert("❌ No se pudo acceder a la cámara: " + error);
+          });
+      }
+    }
+
+    // Función para convertir dataURL a Blob
+    function dataURLtoBlob(dataUrl) {
+      const byteString = atob(dataUrl.split(',')[1]);
+      const arrayBuffer = new ArrayBuffer(byteString.length);
+      const uintArray = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < byteString.length; i++) {
+        uintArray[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([arrayBuffer], { type: "image/jpeg" });
+    }
+
+    // Función para crear un FileList (simula el archivo de la foto capturada)
+    function createFileList(blob) {
+      const file = new File([blob], "foto.jpg", { type: "image/jpeg" });
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      return dataTransfer.files;
+    }
+
+    // Función para enviar el formulario
+    function enviarFormulario() {
+      const codigo = document.getElementById("codigo").value;
+      const nombre = document.getElementById("nombre").value;
+      const ruta = document.getElementById("ruta").value;
+      const motivo = document.getElementById("motivo").value;
+      const foto = document.getElementById("foto").files[0];
+
+      if (!codigo || !nombre || !ruta || !motivo || !foto) {
+        alert("⚠️ Por favor completa todos los campos.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('codigo', codigo);
+      formData.append('nombre', nombre);
+      formData.append('ruta', ruta);
+      formData.append('motivo', motivo);
+      formData.append('foto', foto);
+
+      // Enviar datos a Google Apps Script
+      fetch(URL_SCRIPT_UPLOAD, {
+        method: 'POST',
+        body: formData
       })
-    })
-    .then(() => {
-      alert("✅ Cliente eliminado correctamente.");
-      document.getElementById("codigo").value = "";
-      document.getElementById("ruta").value = "";
-      document.getElementById("motivo").value = "";
-    })
-    .catch(error => {
-      alert("❌ Error al enviar los datos: " + error);
-    });
-  }
-</script>
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'ok') {
+          alert("✅ Cliente eliminado correctamente. Foto guardada en Google Drive.");
+          // Limpiar formulario después de enviar
+          document.getElementById("codigo").value = "";
+          document.getElementById("nombre").value = "";
+          document.getElementById("ruta").value = "";
+          document.getElementById("motivo").value = "";
+          document.getElementById("foto").value = "";
+        } else {
+          alert("❌ Error al guardar los datos.");
+        }
+      })
+      .catch(error => {
+        alert("❌ Error al enviar los datos: " + error);
+      });
+    }
+  </script>
 
 </body>
 </html>
+
+
