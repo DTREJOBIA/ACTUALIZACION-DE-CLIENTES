@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -91,40 +91,50 @@
         return;
       }
 
-      const formData = new FormData();
-      formData.append('codigo', codigo);
-      formData.append('nombre', nombre);
-      formData.append('ruta', ruta);
-      formData.append('motivo', motivo);
-      formData.append('foto', foto);
+      const reader = new FileReader();
+      reader.onloadend = function () {
+        // Convertir la imagen a base64
+        const base64Foto = reader.result.split(',')[1]; // eliminar el encabezado base64
+        const data = {
+          codigo: codigo,
+          nombre: nombre,
+          ruta: ruta,
+          motivo: motivo,
+          foto: base64Foto
+        };
 
-      // Enviar datos a Google Apps Script
-      fetch(URL_SCRIPT_UPLOAD, {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === 'ok') {
-          alert("✅ Cliente eliminado correctamente. Foto guardada en Google Drive.");
-          // Limpiar formulario después de enviar
-          document.getElementById("codigo").value = "";
-          document.getElementById("nombre").value = "";
-          document.getElementById("ruta").value = "";
-          document.getElementById("motivo").value = "";
-          document.getElementById("foto").value = "";
-        } else {
-          alert("❌ Error al guardar los datos.");
-        }
-      })
-      .catch(error => {
-        alert("❌ Error al enviar los datos: " + error);
-      });
+        // Enviar los datos al Google Apps Script
+        fetch(URL_SCRIPT_UPLOAD, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'ok') {
+            alert("✅ Cliente eliminado correctamente. Foto guardada en Google Drive.");
+            // Limpiar formulario después de enviar
+            document.getElementById("codigo").value = "";
+            document.getElementById("nombre").value = "";
+            document.getElementById("ruta").value = "";
+            document.getElementById("motivo").value = "";
+            document.getElementById("foto").value = "";
+          } else {
+            alert("❌ Error al guardar los datos.");
+          }
+        })
+        .catch(error => {
+          alert("❌ Error al enviar los datos: " + error);
+        });
+      };
+      reader.readAsDataURL(foto); // Leer la imagen como base64
     }
   </script>
-
 </body>
 </html>
+
 
 
 
