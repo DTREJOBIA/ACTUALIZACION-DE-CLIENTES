@@ -58,11 +58,39 @@
     footer p {
       margin: 0;
     }
+
+    /* Título con efecto arcoíris */
+    .title-rtm {
+      font-size: 3rem;
+      font-weight: bold;
+    }
+
+    .rainbow-word {
+      background: linear-gradient(270deg, #ff0000, #ff8c00, #ffff00, #00ff00, #00ced1, #1e90ff, #8a2be2, #ff1493);
+      background-size: 800% 800%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rainbow-move 30s linear infinite;
+      font-weight: bold;
+    }
+
+    @keyframes rainbow-move {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Texto en negro para la parte de Portal Principal */
+    .text-black {
+      color: black;
+    }
   </style>
 </head>
 <body>
   <div class="container mt-5">
-    <h1 class="text-center mb-4">Portal Principal - RTM</h1>
+    <h1 class="text-center mb-4">
+      <span class="text-black">Portal Principal - </span><span class="rainbow-word">RTM</span>
+    </h1>
     <div class="row g-4">
       <div class="col-md-6">
         <a href="Coordenadas.html" class="btn btn-primary w-100 btn-lg">📍 Actualizar Coordenadas</a>
@@ -90,5 +118,6 @@
   </footer>
 </body>
 </html>
+
 
 
