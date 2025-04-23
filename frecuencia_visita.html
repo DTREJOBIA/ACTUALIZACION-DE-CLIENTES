@@ -71,7 +71,7 @@
         return;
       }
 
-      fetch("clientes.json") // Reemplaza esta URL por la tuya
+      fetch("clientes.json") // Reemplaza esta URL por la tuya si está en GitHub u online
         .then(response => response.json())
         .then(data => {
           const cliente = data.find(c => c.codigo === codigo);
@@ -90,11 +90,12 @@
 
     function enviarFrecuenciaVisita() {
       const codigo = document.getElementById("codigo").value;
+      const nombre = document.getElementById("nombre").value;
       const ruta = document.getElementById("ruta").value;
       const semana = document.getElementById("semana").value;
       const dia = document.getElementById("dia").value;
 
-      if (!codigo || !ruta || !semana || !dia) {
+      if (!codigo || !nombre || !ruta || !semana || !dia) {
         alert("⚠️ Por favor completa todos los campos.");
         return;
       }
@@ -106,6 +107,7 @@
         body: JSON.stringify({
           tipo: "actualizar_frecuencia_visita",
           codigo: codigo,
+          nombre: nombre,
           ruta: ruta,
           semana: semana,
           dia: dia
@@ -127,3 +129,4 @@
   </script>
 </body>
 </html>
+
