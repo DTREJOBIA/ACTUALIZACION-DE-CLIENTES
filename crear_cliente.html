@@ -109,10 +109,55 @@
   <div class="container mt-5">
     <h2 class="text-center mb-4">Crear Cliente Nuevo</h2>
     <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarFormulario();">
-      <div class="mb-3">
-        <label for="ruta" class="form-label">Ruta:</label>
-        <input type="text" class="form-control" id="ruta" required>
-      </div>
+        
+
+        <div class="mb-3">
+            <label for="ruta" class="form-label">Ruta:</label>
+            <input type="number" class="form-control" id="ruta" name="ruta" required onblur="validarRuta(this)">
+            <div class="invalid-feedback" id="mensajeRuta" style="display: none;">
+              ⚠️ Ruta inválida. Ingresa de nuevo la ruta
+            </div>
+          </div>
+          
+          <script>
+            const rutasValidas = [
+              101, 102, 106, 104, 105, 109, 113, 116, 136, 138, 139, 145, 158, 159, 160,
+              165, 166, 167, 168, 171, 184, 185, 186, 537, 546, 551, 552, 501, 506, 509,
+              511, 512, 518, 519, 527, 528, 529, 547, 563, 526, 561, 564
+            ];
+          
+            function validarRuta(input) {
+              const valor = input.value.trim();
+              const mensaje = document.getElementById("mensajeRuta");
+          
+              if (valor === "") {
+                input.classList.remove("is-invalid", "is-valid");
+                mensaje.style.display = "none";
+                return;
+              }
+          
+              const numero = parseInt(valor);
+              const esValida = rutasValidas.includes(numero) && valor.length === 3;
+          
+              if (esValida) {
+                input.classList.remove("is-invalid");
+                input.classList.add("is-valid");
+                mensaje.style.display = "none";
+              } else {
+                input.value = ""; // ← aquí se limpia el campo
+                input.classList.add("is-invalid");
+                input.classList.remove("is-valid");
+                mensaje.style.display = "block";
+              }
+            }
+          </script>
+          
+          
+          
+          
+          
+         
+          
 
       <div class="mb-3">
         <label for="nombre" class="form-label">Nombre del Cliente:</label>
@@ -128,10 +173,10 @@
         <label for="semana" class="form-label">Semana de Visita:</label>
         <select class="form-select" id="semana" required>
           <option value="">Selecciona una semana</option>
-          <option value="semana1">Semana 1</option>
-          <option value="semana2">Semana 2</option>
-          <option value="semana3">Semana 3</option>
-          <option value="semana4">Semana 4</option>
+          <option value="semana1">Semana1</option>
+          <option value="semana2">Semana2</option>
+          <option value="semana3">Semana3</option>
+          <option value="semana4">Semana4</option>
         </select>
       </div>
 
@@ -150,19 +195,21 @@
       </div>
 
       <div class="mb-3">
-        <label for="id" class="form-label">ID del Cliente:</label>
-        <input type="text" class="form-control" id="id" required>
+        <label for="id" class="form-label">Número de Identidad:</label>
+        <input type="text" class="form-control" id="id" maxlength="13" required oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 13);">
       </div>
+      
 
       <div class="mb-3">
         <label for="rtn" class="form-label">RTN (opcional):</label>
-        <input type="text" class="form-control" id="rtn">
+        <input type="text" class="form-control" id="rtn" maxlength="14" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 14);">
       </div>
-
+      
       <div class="mb-3">
         <label for="telefono" class="form-label">Teléfono (opcional):</label>
-        <input type="tel" class="form-control" id="telefono">
+        <input type="tel" class="form-control" id="telefono" maxlength="8" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);">
       </div>
+      
 
       <div class="mb-3">
         <label for="coordenadas" class="form-label">Coordenadas (Latitud, Longitud):</label>
