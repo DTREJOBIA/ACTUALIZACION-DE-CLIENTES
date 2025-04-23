@@ -8,7 +8,6 @@
   <style>
     .floating-btn { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
     #foto-error { display: none; }
-    .d-flex { display: flex; justify-content: space-between; align-items: center; }
   </style>
 </head>
 <body>
@@ -33,16 +32,8 @@
       </div>
       <div class="mb-3">
         <label for="foto" class="form-label">Subir Foto (máx. 10MB, solo .jpg):</label>
-        <div class="d-flex">
-          <input type="file" class="form-control" id="foto" accept="image/jpeg" onchange="validarFoto()" required>
-          <button type="button" class="btn btn-primary ms-2" onclick="tomarFoto()">📷 Tomar Foto</button>
-        </div>
+        <input type="file" class="form-control" id="foto" accept="image/jpeg" onchange="validarFoto()" required>
         <small id="foto-error" class="form-text text-danger">⚠️ Solo se permite archivos .jpg y hasta 10MB.</small>
-      </div>
-      <div class="mb-3">
-        <video id="video" width="100%" height="auto" style="display:none;" autoplay></video>
-        <canvas id="canvas" style="display:none;"></canvas>
-        <input type="file" id="captura-foto" style="display:none;" accept="image/jpeg" onchange="validarFoto()" />
       </div>
       <button type="submit" class="btn btn-danger w-100">🗑️ Eliminar</button>
     </form>
@@ -85,66 +76,6 @@
           error.style.display = 'none';
         }
       }
-    }
-
-    // Función para tomar foto desde la cámara
-    function tomarFoto() {
-      const video = document.getElementById("video");
-      const canvas = document.getElementById("canvas");
-      const captura = document.getElementById("captura-foto");
-      
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-          .then(function(stream) {
-            video.style.display = "block";
-            video.srcObject = stream;
-
-            // Crear el botón para capturar la foto
-            if (!document.getElementById("capture-btn")) {
-              const captureBtn = document.createElement("button");
-              captureBtn.textContent = "Capturar Foto";
-              captureBtn.id = "capture-btn";
-              captureBtn.classList.add("btn", "btn-success");
-              captureBtn.onclick = function() {
-                const ctx = canvas.getContext("2d");
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const dataUrl = canvas.toDataURL("image/jpeg");
-                const blob = dataURLtoBlob(dataUrl);
-                captura.files = createFileList(blob);
-                video.style.display = "none";
-                canvas.style.display = "none";
-                stream.getTracks().forEach(track => track.stop());
-              };
-
-              // Añadir el botón para capturar la foto al formulario
-              document.querySelector("form").appendChild(captureBtn);
-            }
-          })
-          .catch(function(error) {
-            alert("❌ No se pudo acceder a la cámara: " + error);
-          });
-      }
-    }
-
-    // Función para convertir dataURL a Blob
-    function dataURLtoBlob(dataUrl) {
-      const byteString = atob(dataUrl.split(',')[1]);
-      const arrayBuffer = new ArrayBuffer(byteString.length);
-      const uintArray = new Uint8Array(arrayBuffer);
-      for (let i = 0; i < byteString.length; i++) {
-        uintArray[i] = byteString.charCodeAt(i);
-      }
-      return new Blob([arrayBuffer], { type: "image/jpeg" });
-    }
-
-    // Función para crear un FileList (simula el archivo de la foto capturada)
-    function createFileList(blob) {
-      const file = new File([blob], "foto.jpg", { type: "image/jpeg" });
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      return dataTransfer.files;
     }
 
     // Función para enviar el formulario
@@ -194,5 +125,6 @@
 
 </body>
 </html>
+
 
 
