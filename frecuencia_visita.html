@@ -53,10 +53,13 @@ html, body {
   <div class="container mt-5">
     <h2 class="text-center mb-4">Actualizar Frecuencia de Visita</h2>
     <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarFrecuenciaVisita();">
-      <div class="mb-3">
-        <label for="codigo" class="form-label">Código del Cliente:</label>
-        <input type="text" class="form-control" id="codigo" required>
-      </div>
+
+<div class="mb-3">
+  <label for="nombre" class="form-label">Nombre del Cliente:</label>
+  <input type="text" class="form-control" id="nombre" readonly 
+         style="background-color: #ced4da; border: 2px dashed #6c757d;">
+</div>
+      
       <div class="mb-3">
         <label for="nombre" class="form-label">Nombre del Cliente:</label>
         <input type="text" class="form-control" id="nombre" readonly>
