@@ -81,10 +81,13 @@
         <label for="codigo" class="form-label">Código del Cliente:</label>
         <input type="text" class="form-control" id="codigo" required oninput="buscarCliente()">
       </div>
-      <div class="mb-3">
-        <label for="nombre" class="form-label">Nombre del Cliente:</label>
-        <input type="text" class="form-control" id="nombre" disabled>
-      </div>
+      
+    <div class="mb-3">
+  <label for="nombre" class="form-label">Nombre del Cliente:</label>
+  <input type="text" class="form-control" id="nombre" disabled 
+         style="background-color: #ced4da; border: 2px dashed #6c757d;">
+</div>
+      
       <div class="mb-3">
         <label for="ruta" class="form-label">Ruta:</label>
         <input type="text" class="form-control" id="ruta" maxlength="3" pattern="\d{1,3}" required>
@@ -98,10 +101,10 @@
         <input type="file" class="form-control" id="foto" accept="image/jpeg" onchange="validarFoto()" required>
         <small id="foto-error" class="form-text text-danger">⚠️ Solo se permite archivos .jpg y hasta 10MB.</small>
       </div>
-      <button type="submit" class="btn w-100">Enviar</button>
+      <button type="submit" class="btn w-100">📤Enviar</button>
     </form>
   </div>
-  <a href="index.html" class="btn btn-secondary floating-btn">⬅️ Volver</a>
+
 
   <script>
     const URL_SCRIPT_UPLOAD = "https://script.google.com/macros/s/AKfycbzBV4s5BR0193DiAUDF6fR2ZgJ53MM8PhNwITtXVyOPyBb6mzyPxRUeEDnZ_94oaWI-tw/exec";
