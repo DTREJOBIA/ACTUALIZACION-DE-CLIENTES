@@ -7,26 +7,28 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     html, body {
-  height: 100%;
-  margin: 0;
-  background-image: url('fondo.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  flex-direction: column;
-  color: rgb(8, 0, 0);
-}
+      height: 100%;
+      margin: 0;
+      background-image: url('fondo.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      flex-direction: column;
+      color: rgb(8, 0, 0);
+    }
 
-.container {
-  flex: 1;
-}
+    .container {
+      flex: 1;
+    }
+
     .readonly {
       background-color: #e9ecef;
       border: 2px dashed #adb5bd;
       color: #495057;
       font-style: italic;
     }
+
     .completo {
       background-color: #d4edda !important;
       border: 2px solid #28a745 !important;
@@ -59,13 +61,20 @@
   <script>
     let clientes = [];
 
+    function mostrarAlerta(titulo, mensaje) {
+      document.getElementById("errorModalLabel").innerText = titulo;
+      document.getElementById("errorModalBody").innerText = mensaje;
+      const modal = new bootstrap.Modal(document.getElementById('errorModal'));
+      modal.show();
+    }
+
     fetch('clientes.json')
       .then(response => response.json())
       .then(data => {
         clientes = data;
       })
       .catch(error => {
-        alert("❌ Error al cargar la lista de clientes: " + error);
+        mostrarAlerta("❌ Error", "Error al cargar la lista de clientes: " + error);
       });
 
     function buscarClientePorCodigo() {
@@ -79,13 +88,13 @@
       } else {
         inputNombre.value = "";
         inputNombre.classList.remove("completo");
-        alert("⚠️ Cliente no encontrado.");
+        mostrarAlerta("⚠️ Cliente no encontrado", "No se encontró ningún cliente con ese código.");
       }
     }
 
     function obtenerCoordenadas() {
       const inputLat = document.getElementById("latitud");
-      inputLat.value = ""; // Limpia antes de obtener nuevas
+      inputLat.value = "";
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -93,7 +102,7 @@
           inputLat.value = latLon;
           inputLat.classList.add("completo");
         }, function(error) {
-          alert("⚠️ No se pudieron obtener las coordenadas. Verifica que el GPS esté activo.");
+          mostrarAlerta("⚠️ Ubicación", "No se pudieron obtener las coordenadas. Verifica que el GPS esté activo.");
           console.error("Geolocation error:", error);
         }, {
           enableHighAccuracy: true,
@@ -101,7 +110,7 @@
           maximumAge: 0
         });
       } else {
-        alert("❌ La geolocalización no es compatible con este navegador.");
+        mostrarAlerta("❌ Incompatibilidad", "La geolocalización no es compatible con este navegador.");
       }
     }
 
@@ -109,12 +118,12 @@
       const coordenadas = document.getElementById("latitud").value;
       if (coordenadas) {
         navigator.clipboard.writeText(coordenadas).then(() => {
-          alert("📋 ¡Coordenadas copiadas al portapapeles!");
+          mostrarAlerta("📋 Coordenadas Copiadas", "¡Coordenadas copiadas al portapapeles!");
         }).catch((err) => {
-          alert("❌ Error al copiar las coordenadas: " + err);
+          mostrarAlerta("❌ Error al copiar", "No se pudieron copiar las coordenadas: " + err);
         });
       } else {
-        alert("⚠️ No hay coordenadas para copiar.");
+        mostrarAlerta("⚠️ Vacío", "No hay coordenadas para copiar.");
       }
     }
 
@@ -124,7 +133,7 @@
       const latLon = document.getElementById("latitud").value;
 
       if (!nombre || !codigo || !latLon) {
-        alert("⚠️ Por favor completa todos los campos.");
+        mostrarAlerta("⚠️ Campos incompletos", "Por favor completa todos los campos antes de enviar.");
         return;
       }
 
@@ -142,7 +151,8 @@
         })
       })
       .then(() => {
-        alert("✅ Datos enviados correctamente.");
+        const modal = new bootstrap.Modal(document.getElementById('exitoModal'));
+        modal.show();
         document.getElementById("codigo").value = "";
         document.getElementById("nombre").value = "";
         document.getElementById("latitud").value = "";
@@ -150,7 +160,7 @@
         document.getElementById("latitud").classList.remove("completo");
       })
       .catch(error => {
-        alert("❌ Error al enviar los datos: " + error);
+        mostrarAlerta("❌ Error al enviar", "Hubo un problema al enviar los datos: " + error);
       });
     }
 
@@ -185,14 +195,53 @@
     </form>
   </div>
 
+  <!-- Modal de Éxito -->
+  <div class="modal fade" id="exitoModal" tabindex="-1" aria-labelledby="exitoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-success">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="exitoModalLabel">✅ ¡Envío Exitoso!</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body text-center">
+          Los datos han sido enviados correctamente.<br>¡Gracias por tu actualización!
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success w-100" data-bs-dismiss="modal">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Error/Alerta -->
+  <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-danger">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="errorModalLabel">⚠️ Error</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body text-center" id="errorModalBody">
+          <!-- Mensaje dinámico se inserta aquí -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <footer>
     <div class="footer-content">
       <img src="bia_logo.png" alt="Logo Izquierdo" class="footer-left-img">
       <p>© 2025 BIA HONDURAS • Todos los derechos reservados</p>
     </div>
   </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
 
 
 
