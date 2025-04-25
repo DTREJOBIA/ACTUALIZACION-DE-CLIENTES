@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gestión de Clientes - RTM</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
   <style>
     html, body {
       height: 100%;
@@ -24,20 +23,50 @@
       font-size: 1.2rem;
     }
 
-    .btn-primary { background-color: #4a90e2; border-color: #4a90e2; }
-    .btn-primary:hover { background-color: #357ab7; border-color: #357ab7; }
+    .btn-primary {
+      background-color: #4a90e2;
+      border-color: #4a90e2;
+    }
+    .btn-primary:hover {
+      background-color: #357ab7;
+      border-color: #357ab7;
+    }
 
-    .btn-success { background-color: #28a745; border-color: #28a745; }
-    .btn-success:hover { background-color: #218838; border-color: #218838; }
+    .btn-success {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+    .btn-success:hover {
+      background-color: #218838;
+      border-color: #218838;
+    }
 
-    .btn-warning { background-color: #f39c12; border-color: #f39c12; }
-    .btn-warning:hover { background-color: #e67e22; border-color: #e67e22; }
+    .btn-warning {
+      background-color: #f39c12;
+      border-color: #f39c12;
+    }
+    .btn-warning:hover {
+      background-color: #e67e22;
+      border-color: #e67e22;
+    }
 
-    .btn-danger { background-color: #e74c3c; border-color: #e74c3c; }
-    .btn-danger:hover { background-color: #c0392b; border-color: #c0392b; }
+    .btn-danger {
+      background-color: #e74c3c;
+      border-color: #e74c3c;
+    }
+    .btn-danger:hover {
+      background-color: #c0392b;
+      border-color: #c0392b;
+    }
 
-    .btn-info { background-color: #17a2b8; border-color: #17a2b8; }
-    .btn-info:hover { background-color: #138496; border-color: #138496; }
+    .btn-info {
+      background-color: #17a2b8;
+      border-color: #17a2b8;
+    }
+    .btn-info:hover {
+      background-color: #138496;
+      border-color: #138496;
+    }
 
     .card {
       border-radius: 20px;
@@ -99,11 +128,13 @@
       color: black;
     }
 
-    /* LOGIN STYLES */
-    #login-overlay {
+    /* Login modal custom */
+    #loginModal {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0,0,0,0.7);
       z-index: 9999;
       display: flex;
@@ -111,144 +142,113 @@
       justify-content: center;
     }
 
-    #login-box {
-      background: white;
-      padding: 40px;
-      border-radius: 15px;
-      width: 90%;
+    #loginModal .card {
+      padding: 2rem;
       max-width: 400px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-      text-align: center;
+      width: 100%;
+      background-color: white;
     }
 
-    #login-box h2 {
-      margin-bottom: 20px;
-      font-weight: bold;
-    }
-
-    #login-box input {
-      margin-bottom: 15px;
-    }
-
-    #login-error {
-      color: red;
-      font-size: 0.9rem;
-      display: none;
-    }
-
-    /* BOTÓN CERRAR SESIÓN */
-    #logout-btn {
+    /* Botón cerrar sesión */
+    #logoutBtn {
       position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9998;
-      background-color: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 30px;
-      padding: 10px 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      cursor: pointer;
-      display: none;
+      top: 10px;
+      right: 10px;
+      z-index: 9999;
+      font-size: 0.8rem;
+      padding: 6px 10px;
     }
 
-    #logout-btn:hover {
-      background-color: #c82333;
+    @media (max-width: 576px) {
+      .title-rtm {
+        font-size: 2rem;
+      }
     }
   </style>
 </head>
 <body>
+  <button id="logoutBtn" class="btn btn-sm btn-dark d-none">Cerrar sesión</button>
 
-<!-- BOTÓN CERRAR SESIÓN -->
-<button id="logout-btn">Cerrar Sesión</button>
-
-<!-- LOGIN -->
-<div id="login-overlay">
-  <div id="login-box">
-    <h2>Iniciar Sesión</h2>
-    <form id="login-form">
-      <input type="text" id="username" class="form-control" placeholder="Usuario" required>
-      <input type="password" id="password" class="form-control" placeholder="Contraseña" required>
-      <div id="login-error">Usuario o contraseña incorrectos</div>
-      <button type="submit" class="btn btn-primary mt-3 w-100">Entrar</button>
-    </form>
-  </div>
-</div>
-
-<!-- CONTENIDO PRINCIPAL -->
-<div class="container mt-5">
-  <h1 class="text-center mb-4">
-    <span class="text-black">Gestión de Clientes - </span><span class="rainbow-word">RTM</span>
-  </h1>
-  <div class="row g-4">
-    <div class="col-md-6">
-      <a href="Coordenadas.html" class="btn btn-primary w-100 btn-lg">📍 Actualizar Coordenadas</a>
-    </div>
-    <div class="col-md-6">
-      <a href="nombre_direccion.html" class="btn btn-success w-100 btn-lg">📝 Actualizar Nombre y Dirección</a>
-    </div>
-    <div class="col-md-6">
-      <a href="frecuencia_visita.html" class="btn btn-warning w-100 btn-lg">📆 Actualizar Ruta y Frecuencia</a>
-    </div>
-    <div class="col-md-6">
-      <a href="eliminar_cliente.html" class="btn btn-danger w-100 btn-lg">❌ Eliminar Cliente</a>
-    </div>
-    <div class="col-md-12">
-      <a href="crear_cliente.html" class="btn btn-info w-100 btn-lg">➕ Crear Cliente Nuevo</a>
+  <div id="loginModal">
+    <div class="card">
+      <h4 class="text-center mb-4">Iniciar Sesión</h4>
+      <form id="login-form">
+        <div class="mb-3">
+          <label for="username" class="form-label">Usuario</label>
+          <input type="text" class="form-control" id="username" required>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña</label>
+          <input type="password" class="form-control" id="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Entrar</button>
+      </form>
     </div>
   </div>
-</div>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-content">
-    <img src="bia_logo.png" alt="Logo Izquierdo" class="footer-left-img">
-    <p>© 2025 BIA HONDURAS • Todos los derechos reservados</p>
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">
+      <span class="text-black">Gestión de Clientes - </span><span class="rainbow-word">RTM</span>
+    </h1>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <a href="Coordenadas.html" class="btn btn-primary w-100 btn-lg">📍 Actualizar Coordenadas</a>
+      </div>
+      <div class="col-md-6">
+        <a href="nombre_direccion.html" class="btn btn-success w-100 btn-lg">📝 Actualizar Nombre y Dirección</a>
+      </div>
+      <div class="col-md-6">
+        <a href="frecuencia_visita.html" class="btn btn-warning w-100 btn-lg">📆 Actualizar Ruta y Frecuencia</a>
+      </div>
+      <div class="col-md-6">
+        <a href="eliminar_cliente.html" class="btn btn-danger w-100 btn-lg">❌ Eliminar Cliente</a>
+      </div>
+      <div class="col-md-12">
+        <a href="crear_cliente.html" class="btn btn-info w-100 btn-lg">➕ Crear Cliente Nuevo</a>
+      </div>
+    </div>
   </div>
-</footer>
 
-<!-- LOGIN SCRIPT -->
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const session = localStorage.getItem('rtmLogin');
-    const logoutBtn = document.getElementById('logout-btn');
+  <footer>
+    <div class="footer-content">
+      <img src="bia_logo.png" alt="Logo Izquierdo" class="footer-left-img">
+      <p>© 2025 BIA HONDURAS • Todos los derechos reservados</p>
+    </div>
+  </footer>
 
-    if (session) {
-      const sessionData = JSON.parse(session);
-      const now = new Date().getTime();
-      if (now < sessionData.expiry) {
-        document.getElementById('login-overlay').style.display = 'none';
-        logoutBtn.style.display = 'block';
+  <script>
+    const loginModal = document.getElementById('loginModal');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      // Línea donde puedes cambiar usuario y contraseña
+      if (username === 'comercial' && password === 'Bia2025') {
+        localStorage.setItem('sessionRTM', Date.now());
+        loginModal.style.display = 'none';
+        logoutBtn.classList.remove('d-none');
+      } else {
+        alert('Usuario o contraseña incorrectos.');
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('sessionRTM');
+      location.reload();
+    });
+
+    window.onload = () => {
+      const lastLogin = localStorage.getItem('sessionRTM');
+      const oneDay = 24 * 60 * 60 * 1000;
+
+      if (lastLogin && (Date.now() - lastLogin < oneDay)) {
+        loginModal.style.display = 'none';
+        logoutBtn.classList.remove('d-none');
       }
     }
-  });
-
-  document.getElementById('login-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const errorDiv = document.getElementById('login-error');
-
-    if (username === 'comercial' && password === 'Bia2025') {
-      const expiry = new Date().getTime() + 24 * 60 * 60 * 1000;
-      localStorage.setItem('rtmLogin', JSON.stringify({ expiry }));
-      document.getElementById('login-overlay').style.display = 'none';
-      document.getElementById('logout-btn').style.display = 'block';
-    } else {
-      errorDiv.style.display = 'block';
-    }
-  });
-
-  document.getElementById('logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('rtmLogin');
-    location.reload();
-  });
-</script>
-
+  </script>
 </body>
 </html>
-
-
-
-
-
