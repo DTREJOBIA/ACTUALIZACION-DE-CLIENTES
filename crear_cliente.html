@@ -55,174 +55,155 @@
       margin: 0;
     }
 
-    .alert-custom {
+    /* Estilo mejorado para las alertas */
+    .alerta-ruta {
       display: none;
-      margin-top: 20px;
-      font-size: 1.2em;
+      padding: 10px 15px;
+      margin-top: 5px;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: opacity 0.3s ease-in-out;
     }
 
-    .alert-custom .btn {
-      font-weight: bold;
+    .alerta-ruta.mostrar {
+      display: block;
+      opacity: 1;
+    }
+
+    .alerta-ruta.mostrar.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .alerta-ruta.mostrar.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alerta-ruta .icono {
+      margin-right: 10px;
+    }
+
+    .alerta-ruta.error .icono {
+      content: url('https://img.icons8.com/ios-filled/50/000000/error.png');
+    }
+
+    .alerta-ruta.success .icono {
+      content: url('https://img.icons8.com/ios-filled/50/000000/checkmark.png');
     }
 
   </style>
 
   <script>
-    function obtenerCoordenadas() {
-      const inputLat = document.getElementById("coordenadas");
-      inputLat.value = "";
+    const rutasValidas = [
+      101, 102, 106, 104, 105, 109, 113, 116, 136, 138, 139, 145, 158, 159, 160,
+      165, 166, 167, 168, 171, 184, 185, 186, 537, 546, 551, 552, 501, 506, 509,
+      511, 512, 518, 519, 527, 528, 529, 547, 563, 526, 561, 564
+    ];
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-          const latLon = position.coords.latitude + "," + position.coords.longitude;
-          inputLat.value = latLon;
-          inputLat.classList.add("completo");
-        }, function(error) {
-          mostrarAlerta("error", "⚠️ No se pudieron obtener las coordenadas. Verifica que el GPS esté activo.");
-          console.error("Geolocation error:", error);
-        }, {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        });
-      } else {
-        mostrarAlerta("error", "❌ La geolocalización no es compatible con este navegador.");
-      }
-    }
+    function validarRuta(input) {
+      const valor = input.value.trim();
+      const mensaje = document.getElementById("mensajeRuta");
 
-    function enviarFormulario() {
-      const ruta = document.getElementById("ruta").value.trim();
-      const nombre = document.getElementById("nombre").value.trim();
-      const direccion = document.getElementById("direccion").value.trim();
-      const semana = document.getElementById("semana").value;
-      const dia = document.getElementById("dia").value;
-      const id = document.getElementById("id").value.trim();
-      const rtn = document.getElementById("rtn").value.trim();
-      const telefono = document.getElementById("telefono").value.trim();
-      const coordenadas = document.getElementById("coordenadas").value.trim();
+      // Reseteamos la clase al inicio
+      mensaje.classList.remove("mostrar", "error", "success");
 
-      if (!ruta || !nombre || !direccion || !semana || !dia || !id || !coordenadas) {
-        mostrarAlerta("error", "⚠️ Por favor completa todos los campos obligatorios.");
+      if (valor === "") {
+        input.classList.remove("is-invalid", "is-valid");
         return;
       }
 
-      const [latitud, longitud] = coordenadas.split(",");
+      const numero = parseInt(valor);
+      const esValida = rutasValidas.includes(numero) && valor.length === 3;
 
-      fetch('https://script.google.com/macros/s/AKfycbwlokjzWuk3bEeeV-VFF8nv7lopVci-UFT1YKzlZQV_zNMd2XGYAR1FFAyTD_lGo-kV/exec', {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          ruta: ruta,
-          nombre: nombre,
-          direccion: direccion,
-          semana: semana,
-          dia: dia,
-          id: id,
-          rtn: rtn,
-          telefono: telefono,
-          latitud: latitud,
-          longitud: longitud
-        })
-      })
-      .then(() => {
-        mostrarAlerta("success", "✅ Cliente creado exitosamente.");
-        document.querySelector("form").reset();
-        document.getElementById("coordenadas").classList.remove("completo");
-      })
-      .catch((error) => {
-        mostrarAlerta("error", "❌ Error al enviar los datos: " + error);
-      });
-    }
-
-    function refrescarFormulario() {
-      window.location.reload();
-    }
-
-    function mostrarAlerta(tipo, mensaje) {
-      const alertBox = document.getElementById("alertBox");
-      const alertMessage = document.getElementById("alertMessage");
-      const alertButton = document.getElementById("alertButton");
-
-      if (tipo === "success") {
-        alertBox.classList.remove("alert-danger");
-        alertBox.classList.add("alert-success");
+      if (esValida) {
+        input.classList.remove("is-invalid");
+        input.classList.add("is-valid");
+        mensaje.classList.add("mostrar", "success");
+        mensaje.innerHTML = "<span class='icono'></span> Ruta válida.";
       } else {
-        alertBox.classList.remove("alert-success");
-        alertBox.classList.add("alert-danger");
+        input.value = ""; // ← aquí se limpia el campo
+        input.classList.add("is-invalid");
+        input.classList.remove("is-valid");
+        mensaje.classList.add("mostrar", "error");
+        mensaje.innerHTML = "<span class='icono'></span> ⚠️ Ruta inválida. Ingresa de nuevo la ruta";
       }
-
-      alertMessage.textContent = mensaje;
-      alertBox.style.display = "block";
     }
   </script>
+
 </head>
 
 <body>
   <div class="container mt-5">
     <h2 class="text-center mb-4">Crear Cliente Nuevo</h2>
     <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarFormulario();">
-        
-        <div class="mb-3">
-            <label for="ruta" class="form-label">Ruta:</label>
-            <input type="number" class="form-control" id="ruta" name="ruta" required onblur="validarRuta(this)">
-            <div class="invalid-feedback" id="mensajeRuta" style="display: none;">
-              ⚠️ Ruta inválida. Ingresa de nuevo la ruta
-            </div>
-          </div>
-          
-          <script>
-            const rutasValidas = [
-              101, 102, 106, 104, 105, 109, 113, 116, 136, 138, 139, 145, 158, 159, 160,
-              165, 166, 167, 168, 171, 184, 185, 186, 537, 546, 551, 552, 501, 506, 509,
-              511, 512, 518, 519, 527, 528, 529, 547, 563, 526, 561, 564
-            ];
-          
-            function validarRuta(input) {
-              const valor = input.value.trim();
-              const mensaje = document.getElementById("mensajeRuta");
-          
-              if (valor === "") {
-                input.classList.remove("is-invalid", "is-valid");
-                mensaje.style.display = "none";
-                return;
-              }
-          
-              const numero = parseInt(valor);
-              const esValida = rutasValidas.includes(numero) && valor.length === 3;
-          
-              if (esValida) {
-                input.classList.remove("is-invalid");
-                input.classList.add("is-valid");
-                mensaje.style.display = "none";
-              } else {
-                input.value = ""; 
-                input.classList.add("is-invalid");
-                input.classList.remove("is-valid");
-                mensaje.style.display = "block";
-              }
-            }
-          </script>
+      <div class="mb-3">
+        <label for="ruta" class="form-label">Ruta:</label>
+        <input type="number" class="form-control" id="ruta" name="ruta" required onblur="validarRuta(this)">
+        <div class="alerta-ruta" id="mensajeRuta"></div>
+      </div>
+      
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre del Cliente:</label>
+        <input type="text" class="form-control" id="nombre" required>
+      </div>
+      
+      <div class="mb-3">
+        <label for="direccion" class="form-label">Dirección:</label>
+        <input type="text" class="form-control" id="direccion" required>
+      </div>
 
-    <!-- Form Fields Here -->
+      <div class="mb-3">
+        <label for="semana" class="form-label">Semana de Visita:</label>
+        <select class="form-select" id="semana" required>
+          <option value="">Selecciona una semana</option>
+          <option value="semana1">Semana1</option>
+          <option value="semana2">Semana2</option>
+          <option value="semana3">Semana3</option>
+          <option value="semana4">Semana4</option>
+        </select>
+      </div>
 
-    <div class="mb-3">
-      <label for="coordenadas" class="form-label">Coordenadas (Latitud, Longitud):</label>
-      <input type="text" class="form-control" id="coordenadas" readonly 
-         style="background-color: #ced4da; border: 2px dashed #6c757d;">
-    </div>
+      <div class="mb-3">
+        <label for="dia" class="form-label">Día de Visita:</label>
+        <select class="form-select" id="dia" required>
+          <option value="">Selecciona un día</option>
+          <option value="Lunes">Lunes</option>
+          <option value="Martes">Martes</option>
+          <option value="Miércoles">Miércoles</option>
+          <option value="Jueves">Jueves</option>
+          <option value="Viernes">Viernes</option>
+          <option value="Sábado">Sábado</option>
+          <option value="Domingo">Domingo</option>
+        </select>
+      </div>
 
-    <button type="button" class="btn btn-info w-100" onclick="obtenerCoordenadas()">📍 Obtener Coordenadas</button>
-    <button type="submit" class="btn btn-primary w-100 mt-3">📤 Enviar</button>
-    <button type="button" class="btn btn-warning w-100 mt-2" onclick="refrescarFormulario()">🔄 Refrescar</button>
+      <div class="mb-3">
+        <label for="id" class="form-label">Número de Identidad:</label>
+        <input type="text" class="form-control" id="id" maxlength="13" required oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 13);">
+      </div>
+
+      <div class="mb-3">
+        <label for="rtn" class="form-label">RTN (opcional):</label>
+        <input type="text" class="form-control" id="rtn" maxlength="14" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 14);">
+      </div>
+      
+      <div class="mb-3">
+        <label for="telefono" class="form-label">Teléfono (opcional):</label>
+        <input type="tel" class="form-control" id="telefono" maxlength="8" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);">
+      </div>
+
+      <div class="mb-3">
+        <label for="coordenadas" class="form-label">Coordenadas (Latitud, Longitud):</label>
+        <input type="text" class="form-control" id="coordenadas" readonly style="background-color: #ced4da; border: 2px dashed #6c757d;">
+      </div>
+
+      <button type="button" class="btn btn-info w-100" onclick="obtenerCoordenadas()">📍 Obtener Coordenadas</button>
+      <button type="submit" class="btn btn-primary w-100 mt-3">📤 Enviar</button>
+      <button type="button" class="btn btn-warning w-100 mt-2" onclick="refrescarFormulario()">🔄 Refrescar</button>
     </form>
-
-    <div class="alert alert-custom" id="alertBox">
-      <span id="alertMessage"></span>
-      <button type="button" class="btn btn-success" id="alertButton" onclick="document.getElementById('alertBox').style.display='none'">Aceptar</button>
-    </div>
   </div>
 
   <footer>
@@ -233,4 +214,5 @@
   </footer>
 </body>
 </html>
+
 
