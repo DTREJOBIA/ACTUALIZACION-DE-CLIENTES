@@ -123,7 +123,7 @@
 
       const reader = new FileReader();
       reader.onloadend = function() {
-        const fotoBase64 = reader.result || '';
+        const fotoBase64 = reader.result || ''; // Si no hay foto, pasa vacío
 
         const data = {
           ruta,
@@ -139,7 +139,8 @@
           foto: fotoBase64
         };
 
-        fetch('https://script.google.com/macros/s/AKfycbyNa_cB_bpshtbosDdnj_0tWhWAS6KyDIPz1Re5bCCsqhMPUbVvMSdbtfZwtIfB9lqO/exec', {
+        // Reemplaza con tu URL de Google Apps Script
+        fetch('https://script.google.com/macros/s/AKfycby6POnAEbHbu7fp8otL3DoTPeOJPgq28AYmUcVHGHLUHOv1nZ_-vdBF18Ut2dUPpLz4/exec', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -161,7 +162,7 @@
       if (fotoInput.files[0]) {
         reader.readAsDataURL(fotoInput.files[0]);
       } else {
-        reader.onloadend(); // No hay foto, sigue igual
+        reader.onloadend(); // Si no hay foto, no hace nada
       }
     }
 
