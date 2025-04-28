@@ -7,36 +7,33 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     html, body {
-      height: 100%;
-      margin: 0;
-      background-image: url('fondo.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      display: flex;
-      flex-direction: column;
-      color: rgb(8, 0, 0);
-    }
+  height: 100%;
+  margin: 0;
+  background-image: url('fondo.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  color: rgb(8, 0, 0);
+}
 
-    .container {
-      flex: 1;
-    }
-
+.container {
+  flex: 1;
+}
     .readonly {
       background-color: #f8f9fa;
       border: 2px dashed #adb5bd;
       color: #495057;
       font-style: italic;
     }
-
     .completo {
       background-color: #d4edda !important;
       border: 2px solid #28a745 !important;
       color: #155724 !important;
       font-weight: bold;
     }
-
-    footer {
+   footer {
       background-color: #000;
       padding: 20px;
       color: white;
@@ -70,7 +67,7 @@
           inputLat.value = latLon;
           inputLat.classList.add("completo");
         }, function(error) {
-          mostrarToast("⚠️ No se pudieron obtener las coordenadas. Verifica que el GPS esté activo.", "danger");
+          alert("⚠️ No se pudieron obtener las coordenadas. Verifica que el GPS esté activo.");
           console.error("Geolocation error:", error);
         }, {
           enableHighAccuracy: true,
@@ -78,7 +75,7 @@
           maximumAge: 0
         });
       } else {
-        mostrarToast("❌ La geolocalización no es compatible con este navegador.", "danger");
+        alert("❌ La geolocalización no es compatible con este navegador.");
       }
     }
 
@@ -94,7 +91,7 @@
       const coordenadas = document.getElementById("coordenadas").value.trim();
 
       if (!ruta || !nombre || !direccion || !semana || !dia || !id || !coordenadas) {
-        mostrarToast("⚠️ Por favor completa todos los campos obligatorios.", "warning");
+        alert("⚠️ Por favor completa todos los campos obligatorios.");
         return;
       }
 
@@ -120,39 +117,17 @@
         })
       })
       .then(() => {
-        mostrarToast("✅ Cliente creado exitosamente.", "success");
+        alert("✅ Cliente creado exitosamente.");
         document.querySelector("form").reset();
         document.getElementById("coordenadas").classList.remove("completo");
       })
       .catch((error) => {
-        mostrarToast("❌ Error al enviar los datos: " + error, "danger");
+        alert("❌ Error al enviar los datos: " + error);
       });
     }
 
     function refrescarFormulario() {
       window.location.reload();
-    }
-
-    function mostrarToast(mensaje, tipo) {
-      const toastHTML = `
-        <div class="toast align-items-center text-bg-${tipo} border-0 position-fixed top-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true">
-          <div class="d-flex">
-            <div class="toast-body">
-              ${mensaje}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-          </div>
-        </div>
-      `;
-
-      document.body.insertAdjacentHTML('beforeend', toastHTML);
-
-      const toastElement = document.querySelector('.toast');
-      const toast = new bootstrap.Toast(toastElement);
-      toast.show();
-      toastElement.addEventListener('hidden.bs.toast', function () {
-        toastElement.remove();
-      });
     }
   </script>
 </head>
@@ -161,47 +136,57 @@
   <div class="container mt-5">
     <h2 class="text-center mb-4">Crear Cliente Nuevo</h2>
     <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarFormulario();">
-      <div class="mb-3">
-        <label for="ruta" class="form-label">Ruta:</label>
-        <input type="number" class="form-control" id="ruta" name="ruta" required onblur="validarRuta(this)">
-        <div class="invalid-feedback" id="mensajeRuta" style="display: none;">
-          ⚠️ Ruta inválida. Ingresa de nuevo la ruta
-        </div>
-      </div>
-      <script>
-        const rutasValidas = [
-          101, 102, 106, 104, 105, 109, 113, 116, 136, 138, 139, 145, 158, 159, 160,
-          165, 166, 167, 168, 171, 184, 185, 186, 537, 546, 551, 552, 501, 506, 509,
-          511, 512, 518, 519, 527, 528, 529, 547, 563, 526, 561, 564
-        ];
+        
 
-        function validarRuta(input) {
-          const valor = input.value.trim();
-          const mensaje = document.getElementById("mensajeRuta");
+        <div class="mb-3">
+            <label for="ruta" class="form-label">Ruta:</label>
+            <input type="number" class="form-control" id="ruta" name="ruta" required onblur="validarRuta(this)">
+            <div class="invalid-feedback" id="mensajeRuta" style="display: none;">
+              ⚠️ Ruta inválida. Ingresa de nuevo la ruta
+            </div>
+          </div>
+          
+          <script>
+            const rutasValidas = [
+              101, 102, 106, 104, 105, 109, 113, 116, 136, 138, 139, 145, 158, 159, 160,
+              165, 166, 167, 168, 171, 184, 185, 186, 537, 546, 551, 552, 501, 506, 509,
+              511, 512, 518, 519, 527, 528, 529, 547, 563, 526, 561, 564
+            ];
+          
+            function validarRuta(input) {
+              const valor = input.value.trim();
+              const mensaje = document.getElementById("mensajeRuta");
+          
+              if (valor === "") {
+                input.classList.remove("is-invalid", "is-valid");
+                mensaje.style.display = "none";
+                return;
+              }
+          
+              const numero = parseInt(valor);
+              const esValida = rutasValidas.includes(numero) && valor.length === 3;
+          
+              if (esValida) {
+                input.classList.remove("is-invalid");
+                input.classList.add("is-valid");
+                mensaje.style.display = "none";
+              } else {
+                input.value = ""; // ← aquí se limpia el campo
+                input.classList.add("is-invalid");
+                input.classList.remove("is-valid");
+                mensaje.style.display = "block";
+              }
+            }
+          </script>
+          
+          
+          
+          
+          
+         
+          
 
-          if (valor === "") {
-            input.classList.remove("is-invalid", "is-valid");
-            mensaje.style.display = "none";
-            return;
-          }
-
-          const numero = parseInt(valor);
-          const esValida = rutasValidas.includes(numero) && valor.length === 3;
-
-          if (esValida) {
-            input.classList.remove("is-invalid");
-            input.classList.add("is-valid");
-            mensaje.style.display = "none";
-          } else {
-            input.value = ""; 
-            input.classList.add("is-invalid");
-            input.classList.remove("is-valid");
-            mensaje.style.display = "block";
-          }
-        }
-      </script>
-
-      <div class="mb-3">
+    <div class="mb-3">
         <label for="nombre" class="form-label">Nombre del Cliente:</label>
         <input type="text" class="form-control" id="nombre" required>
       </div>
@@ -240,6 +225,7 @@
         <label for="id" class="form-label">Número de Identidad:</label>
         <input type="text" class="form-control" id="id" maxlength="13" required oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 13);">
       </div>
+      
 
       <div class="mb-3">
         <label for="rtn" class="form-label">RTN (opcional):</label>
@@ -250,12 +236,14 @@
         <label for="telefono" class="form-label">Teléfono (opcional):</label>
         <input type="tel" class="form-control" id="telefono" maxlength="8" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);">
       </div>
+      
 
-      <div class="mb-3">
-        <label for="coordenadas" class="form-label">Coordenadas (Latitud, Longitud):</label>
-        <input type="text" class="form-control" id="coordenadas" readonly 
-               style="background-color: #ced4da; border: 2px dashed #6c757d;">
-      </div>
+     <div class="mb-3">
+      <label for="coordenadas" class="form-label">Coordenadas (Latitud, Longitud):</label>
+      <input type="text" class="form-control" id="coordenadas" readonly 
+         style="background-color: #ced4da; border: 2px dashed #6c757d;">
+    </div>
+
 
       <button type="button" class="btn btn-info w-100" onclick="obtenerCoordenadas()">📍 Obtener Coordenadas</button>
       <button type="submit" class="btn btn-primary w-100 mt-3">📤 Enviar</button>
@@ -263,7 +251,7 @@
     </form>
   </div>
 
-  <footer>
+    <footer>
     <div class="footer-content">
       <img src="bia_logo.png" alt="Logo Izquierdo" class="footer-left-img">
       <p>© 2025 BIA HONDURAS • Todos los derechos reservados</p>
