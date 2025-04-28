@@ -14,7 +14,6 @@
       color: rgb(8, 0, 0);
       overflow-x: hidden;
     }
-
     body::before {
       content: "";
       position: fixed;
@@ -28,53 +27,45 @@
       background-repeat: no-repeat;
       z-index: -1;
     }
-
     .container {
       flex: 1;
     }
-
     footer {
       background-color: #000;
       padding: 20px;
       color: white;
       text-align: center;
     }
-
     .footer-content {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 15px;
     }
-
     .footer-left-img {
       max-height: 40px;
     }
-
     footer p {
       margin: 0;
     }
-
     .modal-content {
       border-radius: 10px;
     }
-
     .modal-header {
       background-color: #28a745;
       color: white;
     }
-
     .modal-footer {
       background-color: #fff;
       text-align: center;
     }
-
     .modal-footer .btn {
       color: black;
       background-color: #ffffff;
       border: 2px solid #28a745;
     }
   </style>
+
   <script>
     function obtenerCoordenadas() {
       const inputLat = document.getElementById("coordenadas");
@@ -121,7 +112,7 @@
       const rtn = document.getElementById("rtn").value.trim();
       const telefono = document.getElementById("telefono").value.trim();
       const coordenadas = document.getElementById("coordenadas").value.trim();
-      const foto = document.getElementById("foto").files[0];
+      const fotoInput = document.getElementById("foto");
 
       if (!ruta || !nombre || !direccion || !semana || !dia || !id || !coordenadas) {
         showToast("⚠️ Por favor completa todos los campos obligatorios.", "warning");
@@ -130,35 +121,48 @@
 
       const [latitud, longitud] = coordenadas.split(",");
 
-      const formData = new FormData();
-      formData.append('ruta', ruta);
-      formData.append('nombre', nombre);
-      formData.append('direccion', direccion);
-      formData.append('semana', semana);
-      formData.append('dia', dia);
-      formData.append('id', id);
-      formData.append('rtn', rtn);
-      formData.append('telefono', telefono);
-      formData.append('latitud', latitud);
-      formData.append('longitud', longitud);
-      if (foto) {
-        formData.append('foto', foto);
-      }
+      const reader = new FileReader();
+      reader.onloadend = function() {
+        const fotoBase64 = reader.result || '';
 
-      fetch('https://script.google.com/macros/s/AKfycbyY2KfZmjkqAXgOaZ3WaIDAJIPtqwdPRwBsUUrigSHn_7gfXe1E_Rg4nOxAcKa7aIcu/exec', {
-        method: 'POST',
-        body: formData
-      })
-      .then(() => {
-        showToast("✅ Cliente creado exitosamente.", "success");
-        const modal = new bootstrap.Modal(document.getElementById('successModal'));
-        modal.show();
-        document.querySelector("form").reset();
-        document.getElementById("coordenadas").classList.remove("completo");
-      })
-      .catch((error) => {
-        showToast("❌ Error al enviar los datos: " + error, "danger");
-      });
+        const data = {
+          ruta,
+          nombre,
+          direccion,
+          semana,
+          dia,
+          id,
+          rtn,
+          telefono,
+          latitud,
+          longitud,
+          foto: fotoBase64
+        };
+
+        fetch('https://script.google.com/macros/s/AKfycbw11uTDJX8gd2wC6PVzZFbnNbzsBjAICzZDK9U8eVa9YNmy1lwptt1lukDCjJ2ybY8J/exec', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(() => {
+          showToast("✅ Cliente creado exitosamente.", "success");
+          const modal = new bootstrap.Modal(document.getElementById('successModal'));
+          modal.show();
+          document.querySelector("form").reset();
+          document.getElementById("coordenadas").classList.remove("completo");
+        })
+        .catch((error) => {
+          showToast("❌ Error al enviar los datos: " + error, "danger");
+        });
+      };
+
+      if (fotoInput.files[0]) {
+        reader.readAsDataURL(fotoInput.files[0]);
+      } else {
+        reader.onloadend(); // No hay foto, sigue igual
+      }
     }
 
     function refrescarFormulario() {
@@ -171,22 +175,18 @@
   <div class="container mt-5">
     <h2 class="text-center mb-4">Crear Cliente Nuevo</h2>
     <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarFormulario();">
-
       <div class="mb-3">
         <label for="ruta" class="form-label">Ruta:</label>
         <input type="text" class="form-control" id="ruta" name="ruta" required maxlength="3" pattern="\d{3}" title="Solo números, máximo 3 caracteres" oninput="this.setCustomValidity('')" />
       </div>
-
       <div class="mb-3">
         <label for="nombre" class="form-label">Nombre del Cliente:</label>
         <input type="text" class="form-control" id="nombre" required>
       </div>
-
       <div class="mb-3">
         <label for="direccion" class="form-label">Dirección:</label>
         <input type="text" class="form-control" id="direccion" required>
       </div>
-
       <div class="mb-3">
         <label for="semana" class="form-label">Semana de Visita:</label>
         <select class="form-select" id="semana" required>
@@ -197,7 +197,6 @@
           <option value="semana4">Semana4</option>
         </select>
       </div>
-
       <div class="mb-3">
         <label for="dia" class="form-label">Día de Visita:</label>
         <select class="form-select" id="dia" required>
@@ -211,27 +210,22 @@
           <option value="Domingo">Domingo</option>
         </select>
       </div>
-
       <div class="mb-3">
         <label for="id" class="form-label">Número de Identidad:</label>
         <input type="text" class="form-control" id="id" maxlength="13" required pattern="\d{1,13}" title="Solo números, máximo 13 caracteres" />
       </div>
-
       <div class="mb-3">
         <label for="rtn" class="form-label">RTN (opcional):</label>
         <input type="text" class="form-control" id="rtn" maxlength="14" pattern="\d{14}" title="Solo números, máximo 14 caracteres" />
       </div>
-
       <div class="mb-3">
         <label for="telefono" class="form-label">Teléfono (opcional):</label>
         <input type="text" class="form-control" id="telefono" maxlength="8" pattern="\d{8}" title="Solo números, máximo 8 caracteres" />
       </div>
-
       <div class="mb-3">
         <label for="foto" class="form-label">Fotografía (opcional):</label>
         <input type="file" class="form-control" id="foto" accept="image/*">
       </div>
-
       <div class="mb-3">
         <label for="coordenadas" class="form-label">Coordenadas (Latitud, Longitud):</label>
         <input type="text" class="form-control" id="coordenadas" readonly style="background-color: #ced4da; border: 2px dashed #6c757d;">
@@ -273,7 +267,3 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-
-
