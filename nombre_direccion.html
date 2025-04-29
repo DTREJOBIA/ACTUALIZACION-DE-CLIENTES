@@ -138,7 +138,7 @@
 
     <script>
         const urlClientes = "clientes.json";
-        const URL_SCRIPT_UPLOAD = "https://script.google.com/macros/s/AKfycbzc0FbiK1R--8zu29ijqe00hGON9nFcF67MFKc4ngecNnfUqNyfW99GwEolnrepDvId/exec"; // URL del script proporcionada
+        const URL_SCRIPT_UPLOAD = "https://script.google.com/macros/s/AKfycbyLZmh6aG7hGT9oVDWYYbRpqCGBPucOMdqvU3h5SCSWRW1t_qeCGcu5t9Z_J7YK30ve/exec"; // Reemplaza con la URL de tu App Script
 
         function validarFoto() {
             const foto = document.getElementById('foto');
@@ -152,7 +152,7 @@
                     error.style.display = 'none';
                 }
             } else {
-                error.style.display = 'none'; // Ocultar el error si no se selecciona archivo
+                error.style.display = 'none';
             }
         }
 
@@ -161,26 +161,36 @@
             const nombre = document.getElementById("nombre").value.trim();
             const direccion = document.getElementById("direccion").value.trim();
             const fotoInput = document.getElementById("foto");
-            const foto = fotoInput.files[0];
+            const fotoFile = fotoInput.files[0];
+            let fotoBase64 = null;
 
             if (!codigo || !nombre || !direccion) {
                 new bootstrap.Modal(document.getElementById('modalError')).show();
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('tipo', 'actualizar_nombre_direccion_foto');
-            formData.append('codigo', codigo);
-            formData.append('nombre', nombre);
-            formData.append('direccion', direccion);
-            if (foto) {
-                formData.append('foto', foto);
+            if (fotoFile) {
+                await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        fotoBase64 = reader.result;
+                        resolve();
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(fotoFile);
+                });
             }
 
             try {
                 const response = await fetch(URL_SCRIPT_UPLOAD, {
                     method: 'POST',
-                    body: formData,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        codigo: codigo,
+                        nombre: nombre,
+                        direccion: direccion,
+                        foto: fotoBase64 // Enviar la foto como Base64
+                    })
                 });
 
                 const result = await response.json();
@@ -190,7 +200,7 @@
                     document.getElementById("nombre").value = "";
                     document.getElementById("direccion").value = "";
                     document.getElementById("nombreActual").value = "";
-                    document.getElementById("foto").value = ""; // Limpiar el campo de archivo
+                    document.getElementById("foto").value = "";
                 } else {
                     new bootstrap.Modal(document.getElementById('modalError')).show();
                 }
