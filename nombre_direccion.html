@@ -1,243 +1,252 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Actualizar Nombre, Dirección y Foto</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            background-image: url('fondo5.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex;
-            flex-direction: column;
-            color: rgb(8, 0, 0);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Actualizar Nombre y Dirección</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background-image: url('fondo5.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      flex-direction: column;
+      color: rgb(8, 0, 0);
+    }
 
-        .container {
-            flex: 1;
-        }
+    .container {
+      flex: 1;
+    }
 
-        .form-container {
-            background-color: rgba(255, 255, 255, 0.85);
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            margin: auto;
-        }
+    .form-container {
+      background-color: rgba(255, 255, 255, 0.85);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      margin: auto;
+    }
 
-        footer {
-            background-color: #000;
-            padding: 20px;
-            color: white;
-            text-align: center;
-        }
+    footer {
+      background-color: #000;
+      padding: 20px;
+      color: white;
+      text-align: center;
+    }
 
-        .footer-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
+    .footer-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
 
-        .footer-left-img {
-            max-height: 40px;
-        }
+    .footer-left-img {
+      max-height: 40px;
+    }
 
-        footer p {
-            margin: 0;
-        }
-
-        #foto-error {
-            display: none;
-        }
-
-        .form-control[type="file"] {
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/4/4e/Upwards_arrow.svg');
-            background-repeat: no-repeat;
-            background-position: center left;
-            background-size: 20px;
-            padding-left: 30px;
-        }
-    </style>
+    footer p {
+      margin: 0;
+    }
+  </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2 class="text-center mb-4">Actualizar Nombre, Dirección y Foto</h2>
-        <form class="form-container" onsubmit="event.preventDefault(); enviarFormulario();">
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Actualizar Nombre y Dirección</h2>
+    <form class="form-container" onsubmit="event.preventDefault(); enviarNombreDireccion();">
 
-            <div class="mb-3">
-                <label for="codigo" class="form-label">Código del Cliente:</label>
-                <input type="text" class="form-control" id="codigo" required>
-            </div>
+      <div class="mb-3">
+        <label for="codigo" class="form-label">Código del Cliente:</label>
+        <input type="text" class="form-control" id="codigo" required>
+      </div>
 
-            <div class="mb-3">
-                <label for="nombreActual" class="form-label">Nombre Actual del Cliente:</label>
-                <input type="text" class="form-control" id="nombreActual" readonly
-                       style="background-color: #ced4da; border: 2px dashed #6c757d;">
-            </div>
+      <div class="mb-3">
+        <label for="nombreActual" class="form-label">Nombre Actual del Cliente:</label>
+        <input type="text" class="form-control" id="nombreActual" readonly 
+               style="background-color: #ced4da; border: 2px dashed #6c757d;">
+      </div>
 
-            <div class="mb-3">
-                <label for="nombre" class="form-label">Nuevo Nombre:</label>
-                <input type="text" class="form-control" id="nombre" required>
-            </div>
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nuevo Nombre:</label>
+        <input type="text" class="form-control" id="nombre">
+      </div>
 
-            <div class="mb-3">
-                <label for="direccion" class="form-label">Nueva Dirección:</label>
-                <input type="text" class="form-control" id="direccion" required>
-            </div>
+      <div class="mb-3">
+        <label for="direccion" class="form-label">Nueva Dirección:</label>
+        <input type="text" class="form-control" id="direccion">
+      </div>
 
-            <div class="mb-3">
-                <label for="foto" class="form-label">Subir Nueva Foto (Opcional):</label>
-                <input type="file" class="form-control" id="foto" accept="image/jpeg" onchange="validarFoto()">
-                <small id="foto-error" class="form-text text-danger">⚠️ Solo se permite archivos .jpg y hasta 10MB.</small>
-            </div>
+      <div class="mb-3">
+        <label for="rtn" class="form-label">RTN (opcional):</label>
+        <input type="text" class="form-control" id="rtn" maxlength="14" inputmode="numeric">
+      </div>
 
-            <button type="submit" class="btn btn-primary w-100">📤 Enviar</button>
-        </form>
-    </div>
+      <div class="mb-3">
+        <label for="idCliente" class="form-label">ID del Cliente (opcional):</label>
+        <input type="text" class="form-control" id="idCliente" maxlength="13" inputmode="numeric">
+      </div>
 
-    <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content border-success">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="modalExitoLabel">¡Envío Exitoso!</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body text-center fs-5 text-success">
-                    Los datos han sido enviados correctamente.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
-                </div>
-            </div>
+      <div class="mb-3">
+        <label for="telefono" class="form-label">Teléfono (opcional):</label>
+        <input type="text" class="form-control" id="telefono" maxlength="8" inputmode="numeric">
+      </div>
+
+      <div class="mb-3">
+        <label for="imagen" class="form-label">Foto RTN"image/*">
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">📤 Enviar</button>
+    </form>
+  </div>
+
+  <!-- Modal de Éxito -->
+  <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content border-success">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="modalExitoLabel">¡Envío Exitoso!</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-    </div>
-
-    <div class="modal fade" id="modalError" tabindex="-1" aria-labelledby="modalErrorLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content border-danger">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="modalErrorLabel">¡Error al Enviar!</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body text-center fs-5 text-danger">
-                    Ocurrió un problema al guardar los datos. Intenta nuevamente.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
+        <div class="modal-body text-center fs-5 text-success">
+          Los datos han sido enviados correctamente.
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        const urlClientes = "clientes.json";
-        const URL_SCRIPT_UPLOAD = "https://script.google.com/macros/s/AKfycbyLZmh6aG7hGT9oVDWYYbRpqCGBPucOMdqvU3h5SCSWRW1t_qeCGcu5t9Z_J7YK30ve/exec"; // Reemplaza con la URL de tu App Script
+  <!-- Modal de Error -->
+  <div class="modal fade" id="modalError" tabindex="-1" aria-labelledby="modalErrorLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content border-danger">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="modalErrorLabel">¡Error al Enviar!</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body text-center fs-5 text-danger">
+          Ocurrió un problema al guardar los datos. Intenta nuevamente.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        function validarFoto() {
-            const foto = document.getElementById('foto');
-            const error = document.getElementById('foto-error');
-            const file = foto.files[0];
-            if (file) {
-                if (file.size > 10 * 1024 * 1024 || !file.name.endsWith('.jpg')) {
-                    error.style.display = 'block';
-                    foto.value = '';
-                } else {
-                    error.style.display = 'none';
-                }
-            } else {
-                error.style.display = 'none';
-            }
+  <script>
+    const urlClientes = "clientes.json";
+
+    async function convertirImagenABase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function enviarNombreDireccion() {
+      const codigo = document.getElementById("codigo").value.trim();
+      const nombre = document.getElementById("nombre").value.trim();
+      const direccion = document.getElementById("direccion").value.trim();
+      const rtn = document.getElementById("rtn").value.trim();
+      const idCliente = document.getElementById("idCliente").value.trim();
+      const telefono = document.getElementById("telefono").value.trim();
+      const archivoImagen = document.getElementById("imagen").files[0];
+
+      if (!codigo) {
+        new bootstrap.Modal(document.getElementById('modalError')).show();
+        return;
+      }
+
+      let imagenBase64 = "";
+      if (archivoImagen) {
+        try {
+          imagenBase64 = await convertirImagenABase64(archivoImagen);
+        } catch (error) {
+          console.error("Error al convertir imagen:", error);
+          new bootstrap.Modal(document.getElementById('modalError')).show();
+          return;
         }
+      }
 
-        async function enviarFormulario() {
-            const codigo = document.getElementById("codigo").value.trim();
-            const nombre = document.getElementById("nombre").value.trim();
-            const direccion = document.getElementById("direccion").value.trim();
-            const fotoInput = document.getElementById("foto");
-            const fotoFile = fotoInput.files[0];
-            let fotoBase64 = null;
+      fetch('https://script.google.com/macros/s/AKfycbzotN-7u1xKJcRM85mYmUJ21pS1mied0E1x8Zg5x4RgZqTyVcFFSIe-RASsr8834ht9/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tipo: "actualizar_nombre_direccion",
+          codigo: codigo,
+          nombre: nombre,
+          direccion: direccion,
+          rtn: rtn,
+          id: idCliente,
+          telefono: telefono,
+          imagen: imagenBase64
+        })
+      })
+      .then(() => {
+        new bootstrap.Modal(document.getElementById('modalExito')).show();
+        document.getElementById("codigo").value = "";
+        document.getElementById("nombre").value = "";
+        document.getElementById("direccion").value = "";
+        document.getElementById("rtn").value = "";
+        document.getElementById("idCliente").value = "";
+        document.getElementById("telefono").value = "";
+        document.getElementById("nombreActual").value = "";
+        document.getElementById("imagen").value = "";
+      })
+      .catch(() => {
+        new bootstrap.Modal(document.getElementById('modalError')).show();
+      });
+    }
 
-            if (!codigo || !nombre || !direccion) {
-                new bootstrap.Modal(document.getElementById('modalError')).show();
-                return;
-            }
+    document.getElementById("codigo").addEventListener("input", async function() {
+      const codigoIngresado = this.value.trim();
+      const nombreActualInput = document.getElementById("nombreActual");
 
-            if (fotoFile) {
-                await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        fotoBase64 = reader.result;
-                        resolve();
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(fotoFile);
-                });
-            }
+      if (!codigoIngresado) {
+        nombreActualInput.value = "";
+        return;
+      }
 
-            try {
-                const response = await fetch(URL_SCRIPT_UPLOAD, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        codigo: codigo,
-                        nombre: nombre,
-                        direccion: direccion,
-                        foto: fotoBase64 // Enviar la foto como Base64
-                    })
-                });
+      try {
+        const response = await fetch(urlClientes);
+        const clientes = await response.json();
+        const cliente = clientes.find(c => c.codigo === codigoIngresado);
+        nombreActualInput.value = cliente ? cliente.nombre : "Cliente no encontrado";
+      } catch (error) {
+        nombreActualInput.value = "Error al buscar";
+        console.error("Error al cargar clientes.json:", error);
+      }
+    });
 
-                const result = await response.json();
-                if (result.status === 'ok') {
-                    new bootstrap.Modal(document.getElementById('modalExito')).show();
-                    document.getElementById("codigo").value = "";
-                    document.getElementById("nombre").value = "";
-                    document.getElementById("direccion").value = "";
-                    document.getElementById("nombreActual").value = "";
-                    document.getElementById("foto").value = "";
-                } else {
-                    new bootstrap.Modal(document.getElementById('modalError')).show();
-                }
-            } catch (error) {
-                console.error("Error al enviar el formulario:", error);
-                new bootstrap.Modal(document.getElementById('modalError')).show();
-            }
-        }
+    // Validación: solo permitir números
+    const soloNumeros = (event) => {
+      const key = event.key;
+      if (!/[0-9]/.test(key) && key !== "Backspace" && key !== "Delete" && key !== "ArrowLeft" && key !== "ArrowRight" && key !== "Tab") {
+        event.preventDefault();
+      }
+    };
 
-        document.getElementById("codigo").addEventListener("input", async function() {
-            const codigoIngresado = this.value.trim();
-            const nombreActualInput = document.getElementById("nombreActual");
+    document.getElementById("rtn").addEventListener("keydown", soloNumeros);
+    document.getElementById("idCliente").addEventListener("keydown", soloNumeros);
+    document.getElementById("telefono").addEventListener("keydown", soloNumeros);
+  </script>
 
-            if (!codigoIngresado) {
-                nombreActualInput.value = "";
-                return;
-            }
+  <footer>
+    <div class="footer-content">
+      <img src="bia_logo.png" alt="Logo Izquierdo" class="footer-left-img">
+      <p>© 2025 BIA HONDURAS • Todos los derechos reservados</p>
+    </div>
+  </footer>
 
-            try {
-                const response = await fetch(urlClientes);
-                const clientes = await response.json();
-                const cliente = clientes.find(c => c.codigo === codigoIngresado);
-                nombreActualInput.value = cliente ? cliente.nombre : "Cliente no encontrado";
-            } catch (error) {
-                nombreActualInput.value = "Error al buscar";
-                console.error("Error al cargar clientes.json:", error);
-            }
-        });
-    </script>
-
-    <footer>
-        <div class="footer-content">
-            <img src="bia_logo.png" alt="Logo Izquierdo" class="footer-left-img">
-            <p>© 2025 BIA HONDURAS • Todos los derechos reservados</p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
