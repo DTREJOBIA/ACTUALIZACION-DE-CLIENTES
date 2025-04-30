@@ -58,116 +58,156 @@
       margin: 0;
     }
   </style>
-  <script>
-    let clientes = [];
+ <!-- ...inicio del código (sin cambios) -->
 
-    function mostrarAlerta(titulo, mensaje) {
-      document.getElementById("errorModalLabel").innerText = titulo;
-      document.getElementById("errorModalBody").innerText = mensaje;
-      const modal = new bootstrap.Modal(document.getElementById('errorModal'));
-      modal.show();
+<script>
+  let clientes = [];
+
+  function mostrarAlerta(titulo, mensaje) {
+    document.getElementById("errorModalLabel").innerText = titulo;
+    document.getElementById("errorModalBody").innerText = mensaje;
+    const modal = new bootstrap.Modal(document.getElementById('errorModal'));
+    modal.show();
+  }
+
+  fetch('clientes.json')
+    .then(response => response.json())
+    .then(data => {
+      clientes = data;
+    })
+    .catch(error => {
+      mostrarAlerta("❌ Error", "Error al cargar la lista de clientes: " + error);
+    });
+
+  function buscarClientePorCodigo() {
+    const codigo = document.getElementById("codigo").value.trim();
+    const cliente = clientes.find(c => c.codigo === codigo);
+    const inputNombre = document.getElementById("nombre");
+
+    if (cliente) {
+      inputNombre.value = cliente.nombre;
+      inputNombre.classList.add("completo");
+    } else {
+      inputNombre.value = "";
+      inputNombre.classList.remove("completo");
+      mostrarAlerta("⚠️ Cliente no encontrado", "No se encontró ningún cliente con ese código.");
     }
+  }
 
-    fetch('clientes.json')
-      .then(response => response.json())
-      .then(data => {
-        clientes = data;
-      })
-      .catch(error => {
-        mostrarAlerta("❌ Error", "Error al cargar la lista de clientes: " + error);
-      });
+  function obtenerCoordenadas() {
+    const inputLat = document.getElementById("latitud");
+    const coordenadasAnteriores = inputLat.value;
 
-    function buscarClientePorCodigo() {
-      const codigo = document.getElementById("codigo").value.trim();
-      const cliente = clientes.find(c => c.codigo === codigo);
-      const inputNombre = document.getElementById("nombre");
-
-      if (cliente) {
-        inputNombre.value = cliente.nombre;
-        inputNombre.classList.add("completo");
-      } else {
-        inputNombre.value = "";
-        inputNombre.classList.remove("completo");
-        mostrarAlerta("⚠️ Cliente no encontrado", "No se encontró ningún cliente con ese código.");
-      }
-    }
-
-    function obtenerCoordenadas() {
-      const inputLat = document.getElementById("latitud");
-      inputLat.value = "";
-
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-          const latLon = position.coords.latitude + "," + position.coords.longitude;
-          inputLat.value = latLon;
-          inputLat.classList.add("completo");
-        }, function(error) {
-          mostrarAlerta("⚠️ Ubicación", "No se pudieron obtener las coordenadas. Verifica que el GPS esté activo.");
-          console.error("Geolocation error:", error);
-        }, {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        });
-      } else {
-        mostrarAlerta("❌ Incompatibilidad", "La geolocalización no es compatible con este navegador.");
-      }
-    }
-
-    function copiarCoordenadas() {
-      const coordenadas = document.getElementById("latitud").value;
-      if (coordenadas) {
-        navigator.clipboard.writeText(coordenadas).then(() => {
-          mostrarAlerta("📋 Coordenadas Copiadas", "¡Coordenadas copiadas al portapapeles!");
-        }).catch((err) => {
-          mostrarAlerta("❌ Error al copiar", "No se pudieron copiar las coordenadas: " + err);
-        });
-      } else {
-        mostrarAlerta("⚠️ Vacío", "No hay coordenadas para copiar.");
-      }
-    }
-
-    function enviarFormulario() {
-      const nombre = document.getElementById("nombre").value;
-      const codigo = document.getElementById("codigo").value;
-      const latLon = document.getElementById("latitud").value;
-
-      if (!nombre || !codigo || !latLon) {
-        mostrarAlerta("⚠️ Campos incompletos", "Por favor completa todos los campos antes de enviar.");
-        return;
-      }
-
-      fetch('https://script.google.com/macros/s/AKfycbzTeY0pmn6tmgkZ4DHrhZveRplKm1J1b-4jY8O2vqX_Ktm8kdOtZrXj2r4y6JsdTfZQDQ/exec', {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json'
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          if (!isNaN(lat) && !isNaN(lon)) {
+            const latLon = lat + "," + lon;
+            inputLat.value = latLon;
+            inputLat.classList.add("completo");
+          } else {
+            mostrarAlerta("⚠️ Coordenadas inválidas", "Se obtuvieron valores no válidos para las coordenadas.");
+            if (coordenadasAnteriores) {
+              inputLat.value = coordenadasAnteriores;
+            }
+          }
         },
-        body: JSON.stringify({
-          nombre: nombre,
-          codigo: codigo,
-          latitud: latLon.split(",")[0],
-          longitud: latLon.split(",")[1]
-        })
-      })
-      .then(() => {
-        const modal = new bootstrap.Modal(document.getElementById('exitoModal'));
-        modal.show();
-        document.getElementById("codigo").value = "";
-        document.getElementById("nombre").value = "";
-        document.getElementById("latitud").value = "";
-        document.getElementById("nombre").classList.remove("completo");
-        document.getElementById("latitud").classList.remove("completo");
-      })
-      .catch(error => {
-        mostrarAlerta("❌ Error al enviar", "Hubo un problema al enviar los datos: " + error);
+        function(error) {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              mostrarAlerta("🔒 Permiso denegado", "Debes permitir el acceso a la ubicación para obtener las coordenadas.");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              mostrarAlerta("📡 Ubicación no disponible", "La ubicación no está disponible. Asegúrate de tener GPS o Internet activo.");
+              break;
+            case error.TIMEOUT:
+              mostrarAlerta("⏱️ Tiempo agotado", "No se pudo obtener la ubicación a tiempo. Intenta de nuevo.");
+              break;
+            default:
+              mostrarAlerta("⚠️ Error desconocido", "Ocurrió un error al intentar obtener la ubicación.");
+              break;
+          }
+          console.error("Geolocation error:", error);
+          if (coordenadasAnteriores) {
+            inputLat.value = coordenadasAnteriores;
+          }
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      mostrarAlerta("❌ Incompatibilidad", "La geolocalización no es compatible con este navegador.");
+    }
+  }
+
+  function copiarCoordenadas() {
+    const coordenadas = document.getElementById("latitud").value;
+    if (coordenadas) {
+      navigator.clipboard.writeText(coordenadas).then(() => {
+        mostrarAlerta("📋 Coordenadas Copiadas", "¡Coordenadas copiadas al portapapeles!");
+      }).catch((err) => {
+        mostrarAlerta("❌ Error al copiar", "No se pudieron copiar las coordenadas: " + err);
       });
+    } else {
+      mostrarAlerta("⚠️ Vacío", "No hay coordenadas para copiar.");
+    }
+  }
+
+  function enviarFormulario() {
+    const nombre = document.getElementById("nombre").value;
+    const codigo = document.getElementById("codigo").value;
+    const latLon = document.getElementById("latitud").value;
+
+    if (!nombre || !codigo || !latLon) {
+      mostrarAlerta("⚠️ Campos incompletos", "Por favor completa todos los campos antes de enviar.");
+      return;
     }
 
-    function refrescarFormulario() {
-      window.location.reload();
+    const partes = latLon.split(",");
+    if (partes.length !== 2 || isNaN(partes[0]) || isNaN(partes[1])) {
+      mostrarAlerta("⚠️ Coordenadas inválidas", "Las coordenadas obtenidas no son válidas.");
+      return;
     }
-  </script>
+
+    fetch('https://script.google.com/macros/s/AKfycbzTeY0pmn6tmgkZ4DHrhZveRplKm1J1b-4jY8O2vqX_Ktm8kdOtZrXj2r4y6JsdTfZQDQ/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        nombre: nombre,
+        codigo: codigo,
+        latitud: partes[0],
+        longitud: partes[1]
+      })
+    })
+    .then(() => {
+      const modal = new bootstrap.Modal(document.getElementById('exitoModal'));
+      modal.show();
+      document.getElementById("codigo").value = "";
+      document.getElementById("nombre").value = "";
+      document.getElementById("latitud").value = "";
+      document.getElementById("nombre").classList.remove("completo");
+      document.getElementById("latitud").classList.remove("completo");
+    })
+    .catch(error => {
+      mostrarAlerta("❌ Error al enviar", "Hubo un problema al enviar los datos: " + error);
+    });
+  }
+
+  function refrescarFormulario() {
+    window.location.reload();
+  }
+</script>
+
+<!-- ...continúa el resto del HTML (sin cambios) -->
+
 </head>
 <body>
   <div class="container mt-5">
