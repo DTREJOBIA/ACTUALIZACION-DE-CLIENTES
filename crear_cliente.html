@@ -131,17 +131,26 @@
             const [latitud, longitud] = coordenadas.split(",");
 
              // Validar la foto si se seleccionó
-            if (foto) {
-                if (foto.size > 10 * 1024 * 1024 || !foto.name.endsWith('.jpg')) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: '⚠️ Solo se permiten archivos .jpg de hasta 10MB.',
-                        confirmButtonText: 'Entendido'
-                    });
-                    return; // Detener el envío si la foto no es válida
-                }
-            }
+        if (!foto) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Foto Requerida',
+        text: '⚠️ Por favor, sube una foto en formato .jpg.',
+        confirmButtonText: 'Entendido'
+    });
+    return;
+}
+
+if (foto.size > 10 * 1024 * 1024 || !foto.name.endsWith('.jpg')) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: '⚠️ Solo se permiten archivos .jpg de hasta 10MB.',
+        confirmButtonText: 'Entendido'
+    });
+    return;
+}
+
 
 
             let base64Foto = '';
