@@ -92,7 +92,7 @@
   <script>
     let selectedCoords = null;
 
-    const map = L.map('map').setView([14.1, -87.2], 13);
+    const map = L.map('map').setView([14.1, -87.2], 13); // Coordenadas iniciales para Honduras
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
@@ -118,6 +118,9 @@
           .openPopup();
 
         map.setView([lat, lon], 16);
+      }, (error) => {
+        console.error("Error al obtener la ubicación: ", error);
+        // Si la ubicación no está disponible, el mapa se queda en la vista predeterminada
       });
     }
 
@@ -126,7 +129,7 @@
     map.on('click', function(e) {
       const lat = e.latlng.lat.toFixed(6);
       const lon = e.latlng.lng.toFixed(6);
-      selectedCoords = `${lat}, ${lon}`;
+      selectedCoords = `${lat},${lon}`; // Formato sin espacio para el input del formulario
       document.getElementById("coordsBox").innerText = `📍 Coordenadas: ${selectedCoords}`;
 
       if (marker) {
@@ -138,10 +141,13 @@
 
     function aceptarCoordenadas() {
       if (selectedCoords) {
+        // Guardar las coordenadas en sessionStorage
         sessionStorage.setItem('coordsSeleccionadas', selectedCoords);
         mostrarNotificacion();
+        // Redirigir a la página del formulario después de un breve retraso
         setTimeout(() => {
-          window.location.href = 'Coordenadas.html';
+          // *** ¡IMPORTANTE! Cambia 'TU_FORMULARIO_CLIENTE.html' por el nombre real de tu archivo de formulario. ***
+          window.location.href = 'crear_cliente.html.html'; 
         }, 2500);
       } else {
         alert("Debes seleccionar un punto en el mapa.");
