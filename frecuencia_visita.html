@@ -46,10 +46,53 @@ html, body {
       margin: 0;
     }
 
+
+
+.home-button {
+    position: fixed; /* Hace que el botón flote */
+    top: 20px;       /* Distancia desde la parte superior */
+    right: 20px;     /* Distancia desde la derecha */
+    background-color: #007bff; /* Azul moderno */
+    color: white;    /* Color del icono */
+    border: none;
+    border-radius: 50%; /* Lo hace redondo */
+    width: 50px;     /* Ancho del botón */
+    height: 50px;    /* Alto del botón */
+    display: flex;   /* Para centrar el icono SVG */
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;     /* Centra verticalmente */
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4); /* Sombra para efecto flotante */
+    cursor: pointer;
+    text-decoration: none; /* Quita el subrayado del enlace */
+    z-index: 1000;   /* Asegura que esté por encima de otros elementos */
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease; /* Transiciones suaves */
+}
+
+.home-button:hover {
+    background-color: #0056b3; /* Azul más oscuro al pasar el ratón */
+    transform: translateY(-2px); /* Pequeño efecto de elevación */
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.6); /* Sombra más pronunciada */
+}
+
+.home-button svg {
+    width: 28px; /* Tamaño del icono SVG */
+    height: 28px;
+}
+
     
   </style>
 </head>
 <body>
+
+
+<a href="index.html" class="home-button" aria-label="Volver a la página de inicio">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+    </svg>
+</a>
+
+  
   <div class="container mt-5">
     <h2 class="text-center mb-4">Actualizar Ruta y Frecuencia</h2>
     <form class="shadow p-4 rounded bg-light" onsubmit="event.preventDefault(); enviarFrecuenciaVisita();">
