@@ -156,5 +156,37 @@
       }, 2000);
     }
   </script>
+
+
+
+  <script>
+    // Guardar coordenadas y volver
+    function irAMapa() {
+        sessionStorage.setItem("origen", "crear");
+        window.location.href = "MAPA_COORD.html";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const origen = sessionStorage.getItem("origen");
+        const coordenadasGuardadas = sessionStorage.getItem("coordenadas");
+
+        if (origen === "crear" && coordenadasGuardadas) {
+            const input = document.getElementById("coordenadas");
+            input.value = coordenadasGuardadas;
+            input.classList.add("completo");
+
+            Swal.fire({
+                icon: 'success',
+                title: '¡Coordenadas insertadas!',
+                text: '✅ Se han insertado correctamente desde el mapa.',
+                confirmButtonText: 'OK'
+            });
+
+            sessionStorage.removeItem("coordenadas");
+            sessionStorage.removeItem("origen");
+        }
+    });
+</script>
+
 </body>
 </html>
