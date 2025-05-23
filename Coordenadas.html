@@ -63,6 +63,17 @@
 <script>
   let clientes = [];
 
+document.addEventListener('DOMContentLoaded', () => {
+  const coords = sessionStorage.getItem('coordsSeleccionadas');
+  if (coords) {
+    const inputLat = document.getElementById("latitud");
+    inputLat.value = coords;
+    inputLat.classList.add("completo");
+    sessionStorage.removeItem('coordsSeleccionadas');
+  }
+});
+
+  
   function mostrarAlerta(titulo, mensaje) {
     document.getElementById("errorModalLabel").innerText = titulo;
     document.getElementById("errorModalBody").innerText = mensaje;
