@@ -338,6 +338,23 @@ if (foto.size > 10 * 1024 * 1024 || !foto.name.endsWith('.jpg')) {
             <p>© 2025 BIA HONDURAS • Todos los derechos reservados</p>
         </div>
     </footer>
+
+
+    <script>
+        // Script para cargar las coordenadas del sessionStorage al campo
+        document.addEventListener('DOMContentLoaded', function() {
+            const storedCoords = sessionStorage.getItem('coordsSeleccionadas');
+            const coordsInput = document.getElementById('coordenadas');
+
+            if (storedCoords) {
+                coordsInput.value = storedCoords;
+                coordsInput.classList.add("completo"); // Aplica el estilo si las coordenadas están presentes
+                // Limpiar sessionStorage después de usar para evitar que se carguen en cada refresco accidental
+                sessionStorage.removeItem('coordsSeleccionadas');
+            }
+        });
+    </script>
+    
 </body>
 </html>
 
